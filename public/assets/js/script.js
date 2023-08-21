@@ -11,9 +11,9 @@ let swiper = new Swiper(".mySwiper", {
   grabCursor: true,
  });
 
-// show on scroll animation using intersection observer api
-const section = document.querySelector("#join-text");
-const joinText = document.querySelector("#join-text");
+// pop on scroll animation using intersection observer api
+const section = document.querySelector("#join");
+const joinText = document.querySelector("#join");
 
 const objOptions = {
   root: null
