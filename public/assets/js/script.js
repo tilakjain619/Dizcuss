@@ -24,7 +24,6 @@ sectionObserver.observe(section);
 
 function callBackFunction(entries) {
   const [entry] = entries;
-  console.log(entry);
   if (entry.isIntersecting) {
     joinText.classList.remove("j-text");
   } else {
