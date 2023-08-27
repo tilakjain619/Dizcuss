@@ -7,14 +7,25 @@
     <title>Home | Dizcuss</title>
 </head>
 <body>
+    <section id="create-discussion">
+        <h2>Create a New Discussion</h2>
+        <form id="discussion-form">
+    
+            <label for="content">Content:</label><br>
+            <textarea id="content" name="content" rows="4" cols="50" required></textarea><br>
+    
+            <button type="submit">Create Discussion</button>
+        </form>
+    </section>
+    
     <div id="discussions"></div><br>
     <hr>
-    <!-- In your index.html file -->
     <div id="popup" class="popup">
         <div class="popup-content">
-            <span class="close-popup">&times;</span>
+          <span class="close-popup">&times;</span>
         </div>
-    </div>
+      </div>
+      
 
     <div id="myModal" class="modal" style="display: none;">
         <div class="modal-content">

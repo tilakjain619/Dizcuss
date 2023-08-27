@@ -5,6 +5,20 @@ const replyContentInput = document.getElementById('replyContent');
 const submitReplyButton = document.getElementById('submitReply');
 let currentDiscussionId = '';
 
+function openPopup(content) {
+    const popup = document.getElementById('popup');
+    const popupContent = popup.querySelector('.popup-content');
+    const closePopupButton = popup.querySelector('.close-popup');
+
+    popupContent.innerHTML = '';
+    popupContent.appendChild(content);
+    popup.style.display = 'block';
+
+    closePopupButton.addEventListener('click', () => {
+        popup.style.display = 'none';
+    });
+}
+
 async function fetchDiscussions() {
     discussionsContainer.innerHTML = '';
 
@@ -15,9 +29,11 @@ async function fetchDiscussions() {
         discussions.forEach(discussion => {
             const discussionElement = document.createElement('div');
             discussionElement.innerHTML = `
-                <h2>${discussion.title}</h2>
                 <p>${discussion.content}</p>
                 <button class="reply-button" data-id="${discussion._id}">Reply</button>
+                <button class="like-discussion-button" data-id="${discussion._id}">Like (${discussion.likes})</button>
+  <button class="dislike-discussion-button" data-id="${discussion._id}">Dislike (${discussion.dislikes})</button>
+  <button class="delete-discussion-button" data-id="${discussion._id}">Delete</button> <!-- Add this line -->
             `;
 
             const repliesContainer = document.createElement('div');
@@ -43,19 +59,39 @@ async function fetchDiscussions() {
 
 async function handleLikeDislike(event, isLike) {
     const replyId = event.target.getAttribute('data-id');
-
+    
     try {
-        const response = await fetch(`/api/replies/${replyId}/${isLike ? 'like' : 'dislike'}`, {
-            method: 'PUT'
-        });
-
-        if (response.ok) {
-            fetchDiscussions();
-        }
+      const response = await fetch(`/api/replies/${replyId}/${isLike ? 'like' : 'dislike'}`, {
+        method: 'PUT'
+      });
+  
+      if (response.ok) {
+        const button = event.target;
+        const oppositeButton = isLike ? button.nextElementSibling : button.previousElementSibling;
+  
+        button.classList.toggle('active');
+        oppositeButton.classList.remove('active');
+  
+        updateLikeDislikeCount(button, isLike, true);
+        updateLikeDislikeCount(oppositeButton, !isLike, false);
+      }
     } catch (error) {
-        console.error('Error handling like/dislike:', error);
+      console.error('Error handling like/dislike:', error);
     }
-}
+  }
+  function updateLikeDislikeCount(button, isLike, increment) {
+    const countElement = button.querySelector('.count');
+    let count = parseInt(countElement.innerText);
+  
+    if (increment) {
+      count++;
+    } else {
+      count--;
+    }
+  
+    countElement.innerText = count;
+  }
+  
 
 discussionsContainer.addEventListener('click', event => {
     if (event.target.classList.contains('like-button')) {
@@ -65,6 +101,13 @@ discussionsContainer.addEventListener('click', event => {
     } else if (event.target.classList.contains('reply-button')) {
         currentDiscussionId = event.target.getAttribute('data-id');
         modal.style.display = 'block';
+    }
+    else if (event.target.classList.contains('delete-discussion-button')) {
+        const discussionId = event.target.getAttribute('data-id');
+        const confirmDelete = confirm('Are you sure you want to delete this discussion?');
+        if (confirmDelete) {
+            deleteDiscussion(discussionId);
+        }
     }
 });
 
@@ -106,6 +149,7 @@ submitReplyButton.addEventListener('click', async () => {
 
 // Open popup when "Reply" button is clicked
 discussionsContainer.addEventListener('click', event => {
+    // Inside discussionsContainer.addEventListener
     if (event.target.classList.contains('reply-button')) {
         const discussionId = event.target.getAttribute('data-id');
         openPopupWithReplies(discussionId);
@@ -114,47 +158,94 @@ discussionsContainer.addEventListener('click', event => {
     } else if (event.target.classList.contains('dislike-button')) {
         handleLikeDislike(event, false);
     }
+
 });
+
 
 function openPopupWithReplies(discussionId) {
     const discussion = discussions.find(discussion => discussion._id === discussionId);
 
     const popupContent = document.createElement('div');
     popupContent.innerHTML = `
-        <h2>${discussion.title}</h2>
-        <p>${discussion.content}</p>
+      <p>${discussion.content}</p>
     `;
 
     const repliesContainer = document.createElement('div');
     discussion.replies.forEach(reply => {
         const replyElement = document.createElement('div');
         replyElement.innerHTML = `
-            <p>${reply.content}</p>
-            <button class="like-button" data-id="${reply._id}">Like</button>
-            <button class="dislike-button" data-id="${reply._id}">Dislike</button>
-        `;
+        <p>${reply.content}</p>
+        <div>
+          <button class="like-button" data-id="${reply._id}">Like</button>
+          <button class="dislike-button" data-id="${reply._id}">Dislike</button>
+        </div>
+      `;
         repliesContainer.appendChild(replyElement);
     });
 
     popupContent.appendChild(repliesContainer);
-    openPopup(popupContent);
+    openPopup(popupContent); // <-- Corrected line
 }
 
-function openPopup(content) {
-    const popup = document.getElementById('popup');
-    const popupContent = popup.querySelector('.popup-content');
-    const closePopupButton = popup.querySelector('.close-popup');
+span.addEventListener('click', () => {
+    modal.style.display = 'none';
+});
 
-    popupContent.innerHTML = '';
-    popupContent.appendChild(content);
-    popup.style.display = 'block';
+window.addEventListener('click', event => {
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+});
 
-    closePopupButton.addEventListener('click', () => {
-        popup.style.display = 'none';
-    });
+
+const discussionForm = document.getElementById('discussion-form');
+discussionForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const content = document.getElementById('content').value;
+
+    if (!content) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    const newDiscussion = { content };
+
+    try {
+        const response = await fetch('/api/discussions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newDiscussion)
+        });
+
+        if (response.ok) {
+            fetchDiscussions(); // Refresh discussions after creating a new one
+            discussionForm.reset(); // Clear the form
+        } else {
+            alert('Error creating discussion');
+        }
+    } catch (error) {
+        console.error('Error creating discussion:', error);
+    }
+});
+async function deleteDiscussion(discussionId) {
+    try {
+        const response = await fetch(`/api/discussions/${discussionId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            alert('Discussion deleted successfully');
+            fetchDiscussions(); // Refresh discussions after deletion
+        } else {
+            alert('Error deleting discussion');
+        }
+    } catch (error) {
+        console.error('Error deleting discussion:', error);
+    }
 }
-
-// ...
 
 fetchDiscussions();
 
