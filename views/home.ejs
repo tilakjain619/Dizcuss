@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | Dizcuss</title>
+</head>
+<body>
+    <section id="create-discussion">
+        <h2>Create a New Discussion</h2>
+        <form id="discussion-form">
+    
+            <label for="content">Content:</label><br>
+            <textarea id="content" name="content" rows="4" cols="50" required></textarea><br>
+    
+            <button type="submit">Create Discussion</button>
+        </form>
+    </section>
+    
+    <div id="discussions">
+        <% discussions.forEach(discussion => { %>
+            <div>
+                <p>Posted by: <%= discussion.user.username %></p>
+                <p><%= discussion.content %></p>
+                <button class="reply-button" data-id="<%= discussion._id %>">Reply</button>
+                <button class="like-discussion-button" data-id="<%= discussion._id %>">Like (<%= discussion.likes %>)</button>
+                <button class="dislike-discussion-button" data-id="<%= discussion._id %>">Dislike (<%= discussion.dislikes %>)</button>
+                <button class="delete-discussion-button" data-id="<%= discussion._id %>">Delete</button>
+            </div>
+            <div>
+                <% discussion.replies.forEach(reply => { %>
+                    <div>
+                        <p>Posted by: <%= reply.user.username %></p>
+                        <p><%= reply.content %></p>
+                        <button class="like-button" data-id="<%= reply._id %>">Like (<%= reply.likes %>)</button>
+                        <button class="dislike-button" data-id="<%= reply._id %>">Dislike (<%= reply.dislikes %>)</button>
+                    </div>
+                <% }); %>
+            </div>
+        <% }); %>
+    </div>
+    
+    <hr>
+    <div id="popup" class="popup">
+        <div class="popup-content">
+          <span class="close-popup">&times;</span>
+        </div>
+    </div>
+
+    <div id="myModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add Reply</h2>
+            <textarea id="replyContent" rows="4" cols="50"></textarea>
+            <button id="submitReply">Submit</button>
+        </div>
+    </div>
+    <script type="text/javascript" src="../assets/js/app.js"></script>
+</body>
+</html>

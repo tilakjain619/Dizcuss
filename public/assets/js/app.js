@@ -19,49 +19,59 @@ function openPopup(content) {
     });
 }
 
-async function fetchDiscussions() {
-    discussionsContainer.innerHTML = '';
+// ...
 
-    try {
-        const response = await fetch('/api/discussions');
-        discussions = await response.json();
+// async function fetchDiscussions() {
+//     discussionsContainer.innerHTML = '';
 
-        discussions.forEach(discussion => {
-            const discussionElement = document.createElement('div');
-            discussionElement.innerHTML = `
-                <p>${discussion.content}</p>
-                <button class="reply-button" data-id="${discussion._id}">Reply</button>
-                <button class="like-discussion-button" data-id="${discussion._id}">Like (${discussion.likes})</button>
-  <button class="dislike-discussion-button" data-id="${discussion._id}">Dislike (${discussion.dislikes})</button>
-  <button class="delete-discussion-button" data-id="${discussion._id}">Delete</button> <!-- Add this line -->
-            `;
+//     try {
+//         const response = await fetch('/api/discussions');
+//         discussions = await response.json();
 
-            const repliesContainer = document.createElement('div');
-            discussion.replies.forEach(reply => {
-                const replyElement = document.createElement('div');
-                replyElement.innerHTML = `
-                    <p>${reply.content}</p>
-                    <div>
-                        <button class="like-button" data-id="${reply._id}">Like (${reply.likes})</button>
-                        <button class="dislike-button" data-id="${reply._id}">Dislike (${reply.dislikes})</button>
-                    </div>
-                `;
-                repliesContainer.appendChild(replyElement);
-            });
+//         discussions.forEach(discussion => {
+//             const discussionElement = document.createElement('div');
+//             discussionElement.innerHTML = `
+//                 <p><strong>Posted by:</strong> ${discussion.username}</p>
+//                 <p>${discussion.content}</p>
+//                 <button class="reply-button" data-id="${discussion._id}">Reply</button>
+//                 <button class="like-discussion-button" data-id="${discussion._id}">Like (${discussion.likes})</button>
+//                 <button class="dislike-discussion-button" data-id="${discussion._id}">Dislike (${discussion.dislikes})</button>
+//                 <button class="delete-discussion-button" data-id="${discussion._id}">Delete</button>
+//             `;
 
-            discussionElement.appendChild(repliesContainer);
-            discussionsContainer.appendChild(discussionElement);
-        });
-    } catch (error) {
-        console.error('Error fetching discussions:', error);
-    }
-}
+//             const repliesContainer = document.createElement('div');
+//             discussion.replies.forEach(reply => {
+//                 const replyElement = document.createElement('div');
+//                 replyElement.innerHTML = `
+//                     <p><strong>Posted by:</strong> ${reply.username}</p>
+//                     <p>${reply.content}</p>
+//                     <div>
+//                         <button class="like-button" data-id="${reply._id}">Like (${reply.likes})</button>
+//                         <button class="dislike-button" data-id="${reply._id}">Dislike (${reply.dislikes})</button>
+//                     </div>
+//                 `;
+//                 repliesContainer.appendChild(replyElement);
+//             });
+
+//             discussionElement.appendChild(repliesContainer);
+//             discussionsContainer.appendChild(discussionElement);
+//         });
+//     } catch (error) {
+//         console.error('Error fetching discussions:', error);
+//     }
+// }
+
+// ...
+
+
+// ...
 
 async function handleLikeDislike(event, isLike) {
-    const replyId = event.target.getAttribute('data-id');
-    
+    const id = event.target.getAttribute('data-id');
+    const endpoint = isLike ? 'like' : 'dislike';
+  
     try {
-      const response = await fetch(`/api/replies/${replyId}/${isLike ? 'like' : 'dislike'}`, {
+      const response = await fetch(`/api/${endpoint}/${id}`, {
         method: 'PUT'
       });
   
@@ -79,6 +89,18 @@ async function handleLikeDislike(event, isLike) {
       console.error('Error handling like/dislike:', error);
     }
   }
+  
+  // Add an event listener to like and dislike buttons
+  discussionsContainer.addEventListener('click', event => {
+    if (event.target.classList.contains('like-button')) {
+      handleLikeDislike(event, true);
+    } else if (event.target.classList.contains('dislike-button')) {
+      handleLikeDislike(event, false);
+    }
+  });
+  
+  // ...
+  
   function updateLikeDislikeCount(button, isLike, increment) {
     const countElement = button.querySelector('.count');
     let count = parseInt(countElement.innerText);
@@ -247,5 +269,5 @@ async function deleteDiscussion(discussionId) {
     }
 }
 
-fetchDiscussions();
+// fetchDiscussions();
 
