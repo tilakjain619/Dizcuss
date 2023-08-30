@@ -3,10 +3,13 @@ const mongoose = require('mongoose');
 const path = require('path');
 const passport = require('passport');
 const session = require('express-session');
+const multer = require('multer');
 const LocalStrategy = require('passport-local').Strategy;
+// const User = require('../models/user');
 const passportLocalMongoose = require('passport-local-mongoose');
 
 require('dotenv').config();
+
 // atlas connection
 // const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
@@ -14,7 +17,6 @@ require('dotenv').config();
 const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
 const app = express();
 const port = 3000;
-
 app.use(express.json());
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
@@ -28,9 +30,19 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+const storage = multer.diskStorage({
+  destination: './public/uploads/profile', // Upload directory
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage });
+
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
+  profileImage: String,
   discussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
   replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }]
 });
@@ -57,16 +69,22 @@ app.get('/signup', (req, res) => {
   res.render('signup');
 });
 
-app.post('/signup', async (req, res) => {
+app.post('/signup', upload.single('profileImage'), async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = new User({ username });
+    const profileImageURL = '/uploads/profile/' + req.file.filename; // Define profileImageURL
+    const profileImage = req.file ? profileImageURL : ''; // Use profileImageURL here
+
+    const user = new User({ username, profileImage });
     await User.register(user, password);
-    res.redirect('/login');
+
+    res.redirect('/login'); // Redirect to login page after successful signup
   } catch (error) {
-    res.render('signup');
+    res.render('signup'); // Render signup page again in case of error
   }
 });
+
+
 
 app.get('/login', (req, res) => {
   res.render('login');
@@ -109,6 +127,7 @@ app.post('/update-profile', isLoggedIn, async (req, res) => {
 // Define Mongoose schema and models
 const discussionSchema = new mongoose.Schema({
   content: String,
+  profileImage: String,
   likes: { type: Number, default: 0 },
   dislikes: { type: Number, default: 0 },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -117,6 +136,7 @@ const discussionSchema = new mongoose.Schema({
 
 const replySchema = new mongoose.Schema({
   content: String,
+  profileImage: String,
   likes: { type: Number, default: 0 },
   dislikes: { type: Number, default: 0 },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
@@ -133,7 +153,7 @@ mongoose.connect(mongoURI, {
     console.log('Connected to MongoDB Database');
 
     // Create a new discussion and save it to the database
-    app.post('/api/discussions', isLoggedIn, async (req, res) => {
+    app.post('/api/discussions', isLoggedIn, upload.single('profileImage'), async (req, res) => {
       try {
         const newDiscussion = new Discussion({
           content: req.body.content,
@@ -166,7 +186,7 @@ mongoose.connect(mongoURI, {
       }
     });
 
-    app.post('/api/discussions/:discussionId/replies', isLoggedIn, async (req, res) => {
+    app.post('/api/discussions/:discussionId/replies', isLoggedIn, upload.single('profileImage'), async (req, res) => {
       try {
         const discussion = await Discussion.findById(req.params.discussionId);
         if (!discussion) {
@@ -198,6 +218,10 @@ mongoose.connect(mongoURI, {
         if (!discussion) {
           return res.status(404).json({ message: 'Discussion not found' });
         }
+         // Delete associated replies
+    for (const replyId of discussion.replies) {
+      await Reply.findByIdAndDelete(replyId);
+    }
         res.status(200).json({ message: 'Discussion deleted successfully' });
       } catch (error) {
         console.error('Error deleting discussion:', error); // Log the actual error
@@ -205,41 +229,84 @@ mongoose.connect(mongoURI, {
       }
     });
 
-    // ...
-
-    // Update the likes for a reply
-    app.put('/api/like/:replyId', async (req, res) => {
+    // Route for handling likes for discussion
+    app.put('/api/likes/:discussionId', isLoggedIn, async (req, res) => {
       try {
-        const reply = await Reply.findByIdAndUpdate(
+          const discussion = await Discussion.findById(req.params.discussionId);
+  
+          if (!discussion) {
+              return res.status(404).json({ message: 'Discussion not found' });
+          }
+  
+          const updatedDiscussion = await Discussion.findByIdAndUpdate(
+              req.params.discussionId,
+              { $inc: { likes: 1 } }, // Increment the likes count by 1
+              { new: true } // Return the updated discussion
+          );
+  
+          res.json(updatedDiscussion);
+      } catch (error) {
+          res.status(500).json({ message: 'Error updating likes' });
+      }
+  });
+    // Route for handling dislikes for discussion
+    app.put('/api/dislikes/:discussionId', isLoggedIn, async (req, res) => {
+      try {
+          const discussion = await Discussion.findById(req.params.discussionId);
+  
+          if (!discussion) {
+              return res.status(404).json({ message: 'Discussion not found' });
+          }
+  
+          const updatedDiscussion = await Discussion.findByIdAndUpdate(
+              req.params.discussionId,
+              { $inc: { dislikes: 1 } }, // Increment the likes count by 1
+              { new: true } // Return the updated discussion
+          );
+  
+          res.json(updatedDiscussion);
+      } catch (error) {
+          res.status(500).json({ message: 'Error updating likes' });
+      }
+  });
+  
+
+   // Route for handling likes for replies
+    app.put('/api/likes/:replyId', isLoggedIn, async (req, res) => {
+      try {
+        const reply = await Reply.findById(req.params.replyId);
+    
+        if (!reply) {
+          return res.status(404).json({ message: 'Reply not found' });
+        }
+    
+        const updatedReply = await Reply.findByIdAndUpdate(
           req.params.replyId,
           { $inc: { likes: 1 } }, // Increment the likes count by 1
           { new: true } // Return the updated reply
         );
-
-        if (!reply) {
-          return res.status(404).json({ message: 'Reply not found' });
-        }
-
-        res.json(reply);
+    
+        res.json(updatedReply);
       } catch (error) {
         res.status(500).json({ message: 'Error updating likes' });
       }
     });
-
-    // Update the dislikes for a reply
-    app.put('/api/dislike/:replyId', async (req, res) => {
+    // Route for handling dislikes for replies
+    app.put('/api/dislikes/:replyId', isLoggedIn, async (req, res) => {
       try {
-        const reply = await Reply.findByIdAndUpdate(
+        const reply = await Reply.findById(req.params.replyId);
+    
+        if (!reply) {
+          return res.status(404).json({ message: 'Reply not found' });
+        }
+    
+        const updatedReply = await Reply.findByIdAndUpdate(
           req.params.replyId,
           { $inc: { dislikes: 1 } }, // Increment the dislikes count by 1
           { new: true } // Return the updated reply
         );
-
-        if (!reply) {
-          return res.status(404).json({ message: 'Reply not found' });
-        }
-
-        res.json(reply);
+    
+        res.json(updatedReply);
       } catch (error) {
         res.status(500).json({ message: 'Error updating dislikes' });
       }
