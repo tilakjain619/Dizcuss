@@ -5,6 +5,17 @@ const replyContentInput = document.getElementById('replyContent');
 const submitReplyButton = document.getElementById('submitReply');
 let currentDiscussionId = '';
 
+const showToast = (toastMessage) => {
+    Toastify({
+      text: toastMessage,
+      duration: 3000,
+      style: {
+        background: "#fccb06",
+        color: "#000"
+      }
+    }).showToast();
+  };
+
 function openPopup(content) {
     const popup = document.getElementById('popup');
     const popupContent = popup.querySelector('.popup-content');
@@ -19,6 +30,8 @@ function openPopup(content) {
     });
 }
 
+// ...
+
 async function fetchDiscussions() {
     discussionsContainer.innerHTML = '';
 
@@ -29,17 +42,20 @@ async function fetchDiscussions() {
         discussions.forEach(discussion => {
             const discussionElement = document.createElement('div');
             discussionElement.innerHTML = `
+                <p><img src="/uploads/${discussion.profileImage}" alt="Profile Image"> 
+                ${discussion.username}</p>
                 <p>${discussion.content}</p>
                 <button class="reply-button" data-id="${discussion._id}">Reply</button>
                 <button class="like-discussion-button" data-id="${discussion._id}">Like (${discussion.likes})</button>
-  <button class="dislike-discussion-button" data-id="${discussion._id}">Dislike (${discussion.dislikes})</button>
-  <button class="delete-discussion-button" data-id="${discussion._id}">Delete</button> <!-- Add this line -->
+                <button class="dislike-discussion-button" data-id="${discussion._id}">Dislike (${discussion.dislikes})</button>
+                <button class="delete-discussion-button" data-id="${discussion._id}">Delete</button>
             `;
 
             const repliesContainer = document.createElement('div');
             discussion.replies.forEach(reply => {
                 const replyElement = document.createElement('div');
                 replyElement.innerHTML = `
+                    <p><strong>Posted by:</strong> ${reply.username}</p>
                     <p>${reply.content}</p>
                     <div>
                         <button class="like-button" data-id="${reply._id}">Like (${reply.likes})</button>
@@ -57,11 +73,17 @@ async function fetchDiscussions() {
     }
 }
 
+// ...
+
+
+// ...
+
 async function handleLikeDislike(event, isLike) {
-    const replyId = event.target.getAttribute('data-id');
-    
+    const id = event.target.getAttribute('data-id');
+    const endpoint = isLike ? 'likes' : 'dislikes';
+  
     try {
-      const response = await fetch(`/api/replies/${replyId}/${isLike ? 'like' : 'dislike'}`, {
+      const response = await fetch(`/api/${endpoint}/${id}`, {
         method: 'PUT'
       });
   
@@ -79,9 +101,21 @@ async function handleLikeDislike(event, isLike) {
       console.error('Error handling like/dislike:', error);
     }
   }
+  
+  // Add an event listener to like and dislike buttons
+  discussionsContainer.addEventListener('click', event => {
+    if (event.target.classList.contains('like-button')) {
+        console.log('Like button clicked');
+      handleLikeDislike(event, true);
+    } else if (event.target.classList.contains('dislike-button')) {
+        console.log('Dislike button clicked');
+      handleLikeDislike(event, false);
+    }
+  });
+  
   function updateLikeDislikeCount(button, isLike, increment) {
     const countElement = button.querySelector('.count');
-    let count = parseInt(countElement.innerText);
+    let count = countElement.textContent;
   
     if (increment) {
       count++;
@@ -89,14 +123,14 @@ async function handleLikeDislike(event, isLike) {
       count--;
     }
   
-    countElement.innerText = count;
+    countElement.textContent = count;
   }
   
 
 discussionsContainer.addEventListener('click', event => {
-    if (event.target.classList.contains('like-button')) {
+    if (event.target.classList.contains('like-discussion-button')) {
         handleLikeDislike(event, true);
-    } else if (event.target.classList.contains('dislike-button')) {
+    } else if (event.target.classList.contains('dislike-discussion-button')) {
         handleLikeDislike(event, false);
     } else if (event.target.classList.contains('reply-button')) {
         currentDiscussionId = event.target.getAttribute('data-id');
@@ -128,28 +162,35 @@ submitReplyButton.addEventListener('click', async () => {
         return;
     }
 
+    const newReply = {
+        content,
+        profileImage: profileImageURL // Use the stored profile image URL
+    };
+
     try {
         const response = await fetch(`/api/discussions/${currentDiscussionId}/replies`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ content })
+            body: JSON.stringify(newReply)
         });
 
         if (response.ok) {
             modal.style.display = 'none';
             fetchDiscussions();
+        } else {
+            alert('Error adding reply');
         }
     } catch (error) {
         console.error('Error adding reply:', error);
     }
 });
+
 // ...
 
 // Open popup when "Reply" button is clicked
 discussionsContainer.addEventListener('click', event => {
-    // Inside discussionsContainer.addEventListener
     if (event.target.classList.contains('reply-button')) {
         const discussionId = event.target.getAttribute('data-id');
         openPopupWithReplies(discussionId);
@@ -158,12 +199,12 @@ discussionsContainer.addEventListener('click', event => {
     } else if (event.target.classList.contains('dislike-button')) {
         handleLikeDislike(event, false);
     }
-
 });
 
 
 function openPopupWithReplies(discussionId) {
-    const discussion = discussions.find(discussion => discussion._id === discussionId);
+    // chnaged discussion from discussions
+    const discussion = discussion.find(discussion => discussion._id === discussionId);
 
     const popupContent = document.createElement('div');
     popupContent.innerHTML = `
@@ -199,17 +240,22 @@ window.addEventListener('click', event => {
 
 
 const discussionForm = document.getElementById('discussion-form');
+
+
 discussionForm.addEventListener('submit', async (event) => {
     event.preventDefault();
-
+    
     const content = document.getElementById('content').value;
-
+    
     if (!content) {
         alert('Please fill in all fields');
         return;
     }
-
-    const newDiscussion = { content };
+    
+    const newDiscussion = {
+        content,
+        profileImage: profileImageURL // Use the stored profile image URL
+    };
 
     try {
         const response = await fetch('/api/discussions', {
@@ -223,6 +269,7 @@ discussionForm.addEventListener('submit', async (event) => {
         if (response.ok) {
             fetchDiscussions(); // Refresh discussions after creating a new one
             discussionForm.reset(); // Clear the form
+            showToast("Discussion started");
         } else {
             alert('Error creating discussion');
         }
@@ -230,6 +277,7 @@ discussionForm.addEventListener('submit', async (event) => {
         console.error('Error creating discussion:', error);
     }
 });
+
 async function deleteDiscussion(discussionId) {
     try {
         const response = await fetch(`/api/discussions/${discussionId}`, {
@@ -237,7 +285,7 @@ async function deleteDiscussion(discussionId) {
         });
 
         if (response.ok) {
-            alert('Discussion deleted successfully');
+            showToast("Discussion deleted")
             fetchDiscussions(); // Refresh discussions after deletion
         } else {
             alert('Error deleting discussion');
@@ -247,5 +295,5 @@ async function deleteDiscussion(discussionId) {
     }
 }
 
-fetchDiscussions();
+// fetchDiscussions();
 
