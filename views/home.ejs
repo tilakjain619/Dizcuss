@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | Dizcuss</title>
 </head>
@@ -26,26 +28,30 @@
             <div id="discussions">
                 <% discussions.forEach(discussion=> { %>
                     <div>
-                        <p><img src="/uploads/${discussion.profileImage}" alt="Profile Image">
-                            <%= discussion.user.username %>
+                        <p class="user-name">
+                            @<%= discussion.user.username %>
                         </p>
                         <p>
                             <%= discussion.content %>
                         </p>
                         <button class="reply-button" data-id="<%= discussion._id %>">Reply</button>
                         <button class="like-discussion-button" data-id="<%= discussion._id %>">
-                            Like (<span class="count">
+                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                            <span class="count">
                                 <%= discussion.likes %>
-                            </span>)
+                            </span> Likes
                         </button>
-                        <button class="dislike-discussion-button" data-id="<%= discussion._id %>">Dislike (<%=
-                                discussion.dislikes %>)</button>
+                        <button class="dislike-discussion-button" data-id="<%= discussion._id %>">
+                            <i class="fa fa-thumbs-down" aria-hidden="true"></i>
+                            <%= discussion.dislikes %> Dislikes
+                        </button>
                         <button class="delete-discussion-button" data-id="<%= discussion._id %>">Delete</button>
                     </div>
                     <div>
                         <% discussion.replies.forEach(reply=> { %>
                             <div>
-                                <p><img src="/uploads/${reply.profileImage}" alt="Profile Image"><%= reply.user.username %>
+                                <p>
+                                    <%= reply.user.username %>
                                 </p>
                                 <p>
                                     <%= reply.content %>
@@ -60,12 +66,6 @@
                     <% }); %>
             </div>
 
-            <!-- <div id="popup" class="popup">
-            <div class="popup-content">
-              <span class="close-popup">&times;</span>
-            </div>
-        </div> -->
-
             <div id="myModal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <span class="close">&times;</span>
@@ -73,6 +73,21 @@
                     <textarea id="replyContent" rows="4" cols="50"></textarea>
                     <button id="submitReply">Submit</button>
                 </div>
+            </div>
+        </div>
+        
+        <div id="popup" class="popup" style="display: none;">
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <h2>Discussion</h2>
+                <div id="discussion-popup">
+                    <!-- Discussion content goes here -->
+                </div>
+                <h2>Replies</h2>
+                <div id="replies-popup">
+                    <!-- Replies content goes here -->
+                </div>
+                <!-- Add other content here -->
             </div>
         </div>
         <script type="text/javascript" src="../assets/js/app.js"></script>

@@ -71,3 +71,8 @@
     right: 15px;
     cursor: pointer;
 }
+.user-name{
+    font-family: poppins;
+    font-size: 13px;
+    color: #959595;
+}

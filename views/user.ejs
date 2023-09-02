@@ -1,0 +1,22 @@
+<!-- user.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+</head>
+<body>
+    <h1>User Profile</h1>
+    <p>Username: <%= user.username %></p>
+    <p>Email: <%= user.email %></p>
+
+    <h2>Discussions</h2>
+    <ul>
+        <% discussions.forEach(discussion => { %>
+            <li><%= discussion.content %></li>
+        <% }); %>
+    </ul>
+    
+    <!-- Display other user profile information and discussions as needed -->
+</body>
+</html>
