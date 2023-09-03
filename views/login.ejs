@@ -1,17 +1,36 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <title>Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../assets/css/login.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <title>Login to Dizcuss</title>
+</head>
+<body>
 </head>
 
 <body>
-  <h1>Login</h1>
-  <form action="/login" method="POST">
-    <input type="text" name="username" placeholder="Username" value="tilak" required>
-    <input type="password" name="password" placeholder="Password" value="tilak" required>
-    <button type="submit">Login</button>
-  </form>
+  <%- include('sidebar', { currentPage: 'Login' }) %>
+  <div class="login-container">
+    <div class="form-container">
+      <p class="title">Login</p>
+      <form class="form" action="/login" method="POST">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" name="username" placeholder="Username" value="tilak" required>
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" name="password" placeholder="Password" value="tilak" required>
+        </div><br>
+        <button class="sign">Sign in</button>
+      </form>
+      <br>
+      <p class="signup">Don't have an account?
+        <a rel="noopener noreferrer" href="/signup" class="">Sign up</a>
+      </p>
+    </div>
+  </div>
 </body>
-
 </html>

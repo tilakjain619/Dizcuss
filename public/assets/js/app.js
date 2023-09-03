@@ -3,6 +3,7 @@ const modal = document.getElementById('myModal');
 const span = document.getElementsByClassName('close')[0];
 const replyContentInput = document.getElementById('replyContent');
 const submitReplyButton = document.getElementById('submitReply');
+
 let currentDiscussionId = '';
 
 const showToast = (toastMessage) => {
@@ -32,18 +33,18 @@ function openPopup(content) {
 
 // ...
 
-async function fetchDiscussions() {
+async function fetchDiscussions(req) {
     discussionsContainer.innerHTML = '';
-
+    
     try {
         const response = await fetch('/api/discussions');
         discussions = await response.json();
-
+        
         discussions.forEach(discussion => {
             const discussionElement = document.createElement('div');
             discussionElement.innerHTML = `
-                <p><img src="/uploads/${discussion.profileImage}" alt="Profile Image"> 
-                ${discussion.username}</p>
+                <p>
+                ${discussion.user.username}</p>
                 <p>${discussion.content}</p>
                 <button class="reply-button" data-id="${discussion._id}">Reply</button>
                 <button class="like-discussion-button" data-id="${discussion._id}">Like (${discussion.likes})</button>
@@ -55,7 +56,7 @@ async function fetchDiscussions() {
             discussion.replies.forEach(reply => {
                 const replyElement = document.createElement('div');
                 replyElement.innerHTML = `
-                    <p><strong>Posted by:</strong> ${reply.username}</p>
+                    <p><strong>Posted by:</strong> ${reply.user.username}</p>
                     <p>${reply.content}</p>
                     <div>
                         <button class="like-button" data-id="${reply._id}">Like (${reply.likes})</button>
@@ -78,7 +79,7 @@ async function fetchDiscussions() {
 
 // ...
 
-async function handleLikeDislike(event, isLike) {
+async function handleLikeDislike(event, isLike, isActive) {
     const id = event.target.getAttribute('data-id');
     const endpoint = isLike ? 'likes' : 'dislikes';
   
@@ -91,8 +92,8 @@ async function handleLikeDislike(event, isLike) {
         const button = event.target;
         const oppositeButton = isLike ? button.nextElementSibling : button.previousElementSibling;
   
-        button.classList.toggle('active');
-        oppositeButton.classList.remove('active');
+        button.classList.toggle('like-active');
+        oppositeButton.classList.remove('like-active');
   
         updateLikeDislikeCount(button, isLike, true);
         updateLikeDislikeCount(oppositeButton, !isLike, false);
@@ -113,18 +114,36 @@ async function handleLikeDislike(event, isLike) {
     }
   });
   
-  function updateLikeDislikeCount(button, isLike, increment) {
+  function updateLikeDislikeCount(button, isActive, isLike, increment) {
     const countElement = button.querySelector('.count');
-    let count = countElement.textContent;
-  
-    if (increment) {
-      count++;
+    let count = parseInt(countElement.textContent);
+
+    if (isActive) {
+        if (isLike && !increment) {
+            count--; // If it was liked and unliking, decrease count
+        } else if (!isLike && increment) {
+            count--; // If it was disliked and liking, decrease count
+        } else if (isLike && increment) {
+            count++; // If it was liked and liking again, increase count
+        } else if (!isLike && !increment) {
+            count++; // If it was disliked and un-disliking, increase count
+        }
     } else {
-      count--;
+        if (isLike && increment) {
+            count++; // If it was not liked and liking, increase count
+        } else if (!isLike && increment) {
+            count--; // If it was not liked and disliking, decrease count
+        } else if (isLike && !increment) {
+            count--; // If it was not liked and unliking, decrease count
+        } else if (!isLike && !increment) {
+            count++; // If it was not liked and un-disliking, increase count
+        }
     }
-  
+
     countElement.textContent = count;
-  }
+}
+
+
   
 
 discussionsContainer.addEventListener('click', event => {
@@ -163,8 +182,7 @@ submitReplyButton.addEventListener('click', async () => {
     }
 
     const newReply = {
-        content,
-        profileImage: profileImageURL // Use the stored profile image URL
+        content
     };
 
     try {
@@ -187,13 +205,54 @@ submitReplyButton.addEventListener('click', async () => {
     }
 });
 
+
+// ...
+
+const popup = document.getElementById('popup');
+const discussionPopup = document.getElementById('discussion-popup');
+const repliesPopup = document.getElementById('replies-popup');
+
+// Add a click event listener to discussions
+discussionsContainer.addEventListener('click', async (event) => {
+    if (event.target.classList.contains('discussion')) {
+        const discussionId = event.target.dataset.id;
+        const response = await fetch(`/api/discussions/${discussionId}`);
+        const data = await response.json();
+
+        // Populate the popup with discussion content
+        discussionPopup.innerHTML = `
+            <p><strong>@${data.user.username}</strong></p>
+            <p>${data.content}</p>
+        `;
+
+        // Populate the popup with replies content
+        repliesPopup.innerHTML = '';
+        data.replies.forEach((reply) => {
+            repliesPopup.innerHTML += `
+                <div>
+                    <p><strong>@${reply.user.username}</strong></p>
+                    <p>${reply.content}</p>
+                </div>
+            `;
+        });
+
+        // Display the popup
+        popup.style.display = 'block';
+    }
+});
+
+// Close the popup when the close button is clicked
+popup.querySelector('.close-popup').addEventListener('click', () => {
+    popup.style.display = 'none';
+});
+
 // ...
 
 // Open popup when "Reply" button is clicked
 discussionsContainer.addEventListener('click', event => {
     if (event.target.classList.contains('reply-button')) {
         const discussionId = event.target.getAttribute('data-id');
-        openPopupWithReplies(discussionId);
+        // Handle opening the reply popup here if needed
     } else if (event.target.classList.contains('like-button')) {
         handleLikeDislike(event, true);
     } else if (event.target.classList.contains('dislike-button')) {
@@ -201,43 +260,15 @@ discussionsContainer.addEventListener('click', event => {
     }
 });
 
+// ...
 
-function openPopupWithReplies(discussionId) {
-    // chnaged discussion from discussions
-    const discussion = discussion.find(discussion => discussion._id === discussionId);
 
-    const popupContent = document.createElement('div');
-    popupContent.innerHTML = `
-      <p>${discussion.content}</p>
-    `;
-
-    const repliesContainer = document.createElement('div');
-    discussion.replies.forEach(reply => {
-        const replyElement = document.createElement('div');
-        replyElement.innerHTML = `
-        <p>${reply.content}</p>
-        <div>
-          <button class="like-button" data-id="${reply._id}">Like</button>
-          <button class="dislike-button" data-id="${reply._id}">Dislike</button>
-        </div>
-      `;
-        repliesContainer.appendChild(replyElement);
-    });
-
-    popupContent.appendChild(repliesContainer);
-    openPopup(popupContent); // <-- Corrected line
-}
-
-span.addEventListener('click', () => {
-    modal.style.display = 'none';
-});
 
 window.addEventListener('click', event => {
     if (event.target === modal) {
         modal.style.display = 'none';
     }
 });
-
 
 const discussionForm = document.getElementById('discussion-form');
 
@@ -251,10 +282,8 @@ discussionForm.addEventListener('submit', async (event) => {
         alert('Please fill in all fields');
         return;
     }
-    
     const newDiscussion = {
-        content,
-        profileImage: profileImageURL // Use the stored profile image URL
+        content
     };
 
     try {
@@ -294,6 +323,24 @@ async function deleteDiscussion(discussionId) {
         console.error('Error deleting discussion:', error);
     }
 }
+async function fetchUserData(username) {
+    try {
+        const response = await fetch(`/${username}`); // Assuming you have an API endpoint for fetching user data
+        if (response.ok) {
+            const userData = await response.json();
+            return userData;
+        } else {
+            // Handle the case when the response is not okay (e.g., user not found)
+            return null;
+        }
+    } catch (error) {
+        // Handle any errors that occur during data fetching
+        throw error;
+    }
+}
+
+  
+
 
 // fetchDiscussions();
 

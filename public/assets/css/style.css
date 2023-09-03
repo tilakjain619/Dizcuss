@@ -201,6 +201,7 @@ header {
 .user-card {
     overflow: hidden;
     width: 100%;
+    margin-bottom: 5rem;
 }
 
 .users {
@@ -404,8 +405,9 @@ figure.snip1157 blockquote:after {
     font-family: 'FontAwesome';
     content: "\201C";
     position: absolute;
+    color: rgb(0, 0, 0);
     font-size: 50px;
-    opacity: 0.3;
+    opacity: 0.1;
     font-style: normal;
 }
 
@@ -436,7 +438,6 @@ figure.snip1157 .author {
     bottom: 45px;
     padding: 0 10px 0 120px;
     margin: 0;
-    text-transform: uppercase;
     color: #ffffff;
     -webkit-transform: translateY(50%);
     transform: translateY(50%);
@@ -446,12 +447,6 @@ figure.snip1157 .author h5 {
     opacity: 0.8;
     margin: 0;
     font-weight: 800;
-}
-
-figure.snip1157 .author h5 span {
-    font-weight: 400;
-    text-transform: none;
-    padding-left: 5px;
 }
 
 /* footer styling */
@@ -565,7 +560,6 @@ figure.snip1157 .author h5 span {
         display: flex;
         /* height: 300px; */
         /* align-content: center; */
-        margin-bottom: 3rem;
         padding: 3rem;
         align-items: center;
     }
