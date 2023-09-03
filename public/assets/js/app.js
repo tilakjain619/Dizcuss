@@ -323,6 +323,24 @@ async function deleteDiscussion(discussionId) {
         console.error('Error deleting discussion:', error);
     }
 }
+async function fetchUserData(username) {
+    try {
+        const response = await fetch(`/${username}`); // Assuming you have an API endpoint for fetching user data
+        if (response.ok) {
+            const userData = await response.json();
+            return userData;
+        } else {
+            // Handle the case when the response is not okay (e.g., user not found)
+            return null;
+        }
+    } catch (error) {
+        // Handle any errors that occur during data fetching
+        throw error;
+    }
+}
+
+  
+
 
 // fetchDiscussions();
 

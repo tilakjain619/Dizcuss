@@ -128,7 +128,11 @@ const replySchema = new mongoose.Schema({
   content: String,
   likes: { type: Number, default: 0 },
   dislikes: { type: Number, default: 0 },
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+discussion: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Discussion',
+},
 });
 
 const Discussion = mongoose.model('Discussion', discussionSchema);
@@ -184,10 +188,13 @@ mongoose.connect(mongoURI, {
     
         const newReply = new Reply({
           content: req.body.content,
-          user: req.user._id
+          user: req.user._id,
+          discussion: discussion._id, // Use discussion._id to associate the reply with the discussion
         });
     
+        // Save the reply to the database
         await newReply.save();
+    
         req.user.replies.push(newReply);
         await req.user.save();
     
@@ -198,7 +205,8 @@ mongoose.connect(mongoURI, {
       } catch (error) {
         res.status(400).json({ message: error.message });
       }
-    });    
+    });
+     
 
 
     app.delete('/api/discussions/:discussionId', async (req, res) => {
@@ -338,6 +346,34 @@ mongoose.connect(mongoURI, {
         res.status(500).json({ message: 'Error updating dislikes' });
       }
     });
+// Define a route to get a user's profile by username
+app.get('/:username', async (req, res) => {
+  try {
+      const { username } = req.params; // Extract the username from the URL parameters
+
+      // Find the user by their username
+      const user = await User.findOne({ username });
+
+      if (!user) {
+          // If the user doesn't exist, return a 404 response
+          return res.status(404).json({ error: 'User not found' });
+      }
+
+      // Fetch discussions related to the user and populate their replies
+      const discussions = await Discussion.find({ user: user._id })
+          .populate('replies')
+          .exec();
+
+      // Render the 'user.ejs' template with the user and discussions data
+      res.render('user', { user, discussions });
+  } catch (error) {
+      // Handle any errors that occur during data fetching
+      console.error('Error fetching user data:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
     // ...
 

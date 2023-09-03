@@ -3,20 +3,40 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/user.css">
     <title>User Profile</title>
 </head>
 <body>
     <h1>User Profile</h1>
     <p>Username: <%= user.username %></p>
-    <p>Email: <%= user.email %></p>
-
-    <h2>Discussions</h2>
-    <ul>
+    <div class="tab">
+        <button class="tablinks" onclick="openTab(event, 'User-Discussion')">Discussions</button>
+        <button class="tablinks" onclick="openTab(event, 'Paris')">Paris</button>
+      </div>
+      
+      <div id="User-Discussion" class="tabcontent">
+        <ul>
+            <% discussions.forEach(discussion => { %>
+                <li><%= discussion.content %></li>
+            <% }); %>
+        </ul>
+      </div>
+      
+      <div id="Paris" class="tabcontent">
         <% discussions.forEach(discussion => { %>
-            <li><%= discussion.content %></li>
+            <h3><%= discussion.content %></h3>
+            <ul>
+                <% discussion.replies.forEach(reply => { %>
+                    <li>
+                        <%= reply.content %>
+                    </li>
+                <% }); %>
+            </ul>
         <% }); %>
-    </ul>
-    
+    </div>
     <!-- Display other user profile information and discussions as needed -->
+    <!-- <script src="../assets/js/app.js"></script> -->
+    <script src="../assets/js/script.js"></script>
 </body>
 </html>
