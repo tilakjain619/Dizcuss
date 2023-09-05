@@ -588,3 +588,9 @@ figure.snip1157 .author h5 {
         display: block;
     }
 }
+.home-container{
+    width: min(800px, 90%);
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+    margin: auto;
+}

@@ -1,10 +1,4 @@
 /* home page */
-.home-container{
-    width: min(800px, 90%);
-    padding: 20px;
-    font-family: "Poppins", sans-serif;
-    margin: auto;
-}
 .content-input{
     width: 100%;
     background: transparent;
