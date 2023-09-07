@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/photos/brand/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/photos/brand/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
     <link rel="stylesheet" href="../assets/css/home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js" defer></script>
@@ -12,7 +15,7 @@
 </head>
 
 <body>
-    <%- include('sidebar', { currentPage: 'Home' }) %>
+    <%- include('sidebar', { currentPage: 'Home'}) %>
         <div class="home-container">
             <section id="create-discussion">
                 <form id="discussion-form">
@@ -24,30 +27,50 @@
                     <button type="submit" class="submit-button">Create Discussion</button>
                 </form>
             </section>
-
-            <div id="discussions">
+            <% 
+            function formatTimestamp(createdAt) {
+                const now = new Date();
+                const diffInMilliseconds = now - createdAt;
+              
+                if (diffInMilliseconds < 60000) {
+                  return `${Math.floor(diffInMilliseconds / 1000)} seconds ago`;
+                } else if (diffInMilliseconds < 3600000) {
+                  return `${Math.floor(diffInMilliseconds / 60000)} minutes ago`;
+                } else if (diffInMilliseconds < 86400000) {
+                  return `${Math.floor(diffInMilliseconds / 3600000)} hours ago`;
+                } else {
+                  return `${Math.floor(diffInMilliseconds / 86400000)} days ago`;
+                }
+              }
+  %>            
+            <div id="discussions" class="discussion-container">
                 <% discussions.forEach(discussion=> { %>
-                    <div>
+                    <%
+                    const createdAt = new Date(discussion.createdAt);
+            const formattedTimestamp = formatTimestamp(createdAt); %>
+                    <div class="discussion-card">
                         <p class="user-name">
                             @<%= discussion.user.username %>
                         </p>
-                        <p>
+                        <p class="discussion-title" data-id="<%= discussion._id %>">
                             <%= discussion.content %>
                         </p>
-                        <button class="reply-button" data-id="<%= discussion._id %>">Reply</button>
-                        <button class="like-discussion-button" data-id="<%= discussion._id %>">
+                        <p class="discussion-time"><%= formattedTimestamp %></p>
+                        <button class="reply-button discussion-btn" data-id="<%= discussion._id %>">Reply</button> &CenterDot;
+                        <button class="like-discussion-button discussion-btn" data-id="<%= discussion._id %>">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                             <span class="count">
                                 <%= discussion.likes %>
-                            </span> Likes
+                            </span>
                         </button>
-                        <button class="dislike-discussion-button" data-id="<%= discussion._id %>">
+                        <button class="dislike-discussion-button discussion-btn" data-id="<%= discussion._id %>">
                             <i class="fa fa-thumbs-down" aria-hidden="true"></i>
-                            <%= discussion.dislikes %> Dislikes
+                            <%= discussion.dislikes %>
                         </button>
-                        <button class="delete-discussion-button" data-id="<%= discussion._id %>">Delete</button>
+                        <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button>
                     </div>
-                    <div>
+                    <!-- show replies on feed -->
+                    <!-- <div class="reply-card">
                         <% discussion.replies.forEach(reply=> { %>
                             <div>
                                 <p>
@@ -56,35 +79,37 @@
                                 <p>
                                     <%= reply.content %>
                                 </p>
-                                <button class="like-button" data-id="<%= reply._id %>">Like (<%= reply.likes %>
+                                <button class="like-button discussion-btn" data-id="<%= reply._id %>">Like (<%= reply.likes %>
                                         )</button>
-                                <button class="dislike-button" data-id="<%= reply._id %>">Dislike (<%= reply.dislikes %>
+                                <button class="dislike-button discussion-btn" data-id="<%= reply._id %>">Dislike (<%= reply.dislikes %>
                                         )</button>
                             </div>
                             <% }); %>
-                    </div>
+                    </div> -->
                     <% }); %>
             </div>
 
             <div id="myModal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <span class="close">&times;</span>
-                    <h2>Add Reply</h2>
-                    <textarea id="replyContent" rows="4" cols="50"></textarea>
-                    <button id="submitReply">Submit</button>
+                    <h4>Reply</h4>
+                    <textarea id="replyContent" rows="4" cols="50" class="reply-input" placeholder="Start replying..."></textarea>
+                    <p class="error-message"></p>
+                    <button id="submitReply" class="submit-button">Submit</button>
                 </div>
             </div>
         </div>
         
         <div id="popup" class="popup" style="display: none;">
             <div class="popup-content">
-                <span class="close-popup">&times;</span>
+                <span class="close-popup"><i class="fa fa-times" aria-hidden="true"></i>
+                </span>
                 <h2>Discussion</h2>
-                <div id="discussion-popup">
+                <div id="discussion-popup" class="discussion-card">
                     <!-- Discussion content goes here -->
                 </div>
                 <h2>Replies</h2>
-                <div id="replies-popup">
+                <div id="replies-popup" class="reply-card">
                     <!-- Replies content goes here -->
                 </div>
                 <!-- Add other content here -->

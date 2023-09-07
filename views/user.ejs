@@ -1,42 +1,57 @@
 <!-- user.ejs -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/photos/brand/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/photos/brand/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/user.css">
     <title>User Profile</title>
 </head>
+
 <body>
-    <h1>User Profile</h1>
-    <p>Username: <%= user.username %></p>
-    <div class="tab">
-        <button class="tablinks" onclick="openTab(event, 'User-Discussion')">Discussions</button>
-        <button class="tablinks" onclick="openTab(event, 'Paris')">Paris</button>
-      </div>
-      
-      <div id="User-Discussion" class="tabcontent">
-        <ul>
-            <% discussions.forEach(discussion => { %>
-                <li><%= discussion.content %></li>
-            <% }); %>
-        </ul>
-      </div>
-      
-      <div id="Paris" class="tabcontent">
-        <% discussions.forEach(discussion => { %>
-            <h3><%= discussion.content %></h3>
-            <ul>
-                <% discussion.replies.forEach(reply => { %>
-                    <li>
-                        <%= reply.content %>
-                    </li>
-                <% }); %>
-            </ul>
-        <% }); %>
-    </div>
-    <!-- Display other user profile information and discussions as needed -->
-    <!-- <script src="../assets/js/app.js"></script> -->
-    <script src="../assets/js/script.js"></script>
+    <%- include('sidebar', { currentPage: 'Profile' }) %>
+        <section class="home-container">
+            <p class="username-title">
+                <%= user.username %>
+            </p>
+            <div class="tab">
+                <button class="tablinks" onclick="openTab(event, 'User-Discussion')">Discussions</button>
+                <button class="tablinks" onclick="openTab(event, 'User-Replies')">Replies</button>
+            </div>
+
+            <div id="User-Discussion" class="tabcontent">
+                <ul>
+                    <% discussions.forEach(discussion=> { %>
+                        <li>
+                            <%= discussion.content %>
+                        </li>
+                        <% }); %>
+                </ul>
+            </div>
+
+            <div id="User-Replies" class="tabcontent">
+                <% discussions.forEach(discussion=> { %>
+                    <h3>
+                        <%= discussion.content %>
+                    </h3>
+                    <ul>
+                        <% discussion.replies.forEach(reply=> { %>
+                            <li>
+                                <%= reply.content %>
+                            </li>
+                            <% }); %>
+                    </ul>
+                    <% }); %>
+            </div>
+        </section>
+        <!-- Display other user profile information and discussions as needed -->
+        <!-- <script src="../assets/js/app.js"></script> -->
+        <script src="../assets/js/script.js"></script>
 </body>
+
 </html>

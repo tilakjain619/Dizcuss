@@ -34,3 +34,6 @@
     border: 1px solid #ccc;
     border-top: none;
   }
+  .username-title{
+    text-transform: capitalize;
+  }
