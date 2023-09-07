@@ -66,7 +66,7 @@ app.get('/signup', (req, res) => {
 app.post('/signup', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = new User({username});
+    const user = new User({ username });
     await User.register(user, password);
 
     res.redirect('/login'); // Redirect to login page after successful signup
@@ -118,6 +118,7 @@ app.post('/update-profile', isLoggedIn, async (req, res) => {
 // Define Mongoose schema and models
 const discussionSchema = new mongoose.Schema({
   content: String,
+  createdAt: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 },
   dislikes: { type: Number, default: 0 },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -126,13 +127,14 @@ const discussionSchema = new mongoose.Schema({
 
 const replySchema = new mongoose.Schema({
   content: String,
+  createdAt: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 },
   dislikes: { type: Number, default: 0 },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-discussion: {
+  discussion: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Discussion',
-},
+  },
 });
 
 const Discussion = mongoose.model('Discussion', discussionSchema);
@@ -163,21 +165,62 @@ mongoose.connect(atlasConnectionString, {
     app.get('/home', async (req, res) => {
       try {
         const discussions = await Discussion.find().populate('user replies');
-        res.render('home', { discussions }); // Render the 'home.ejs' template with discussions data
+    
+        res.render('home', { discussions, user: req.user });
       } catch (error) {
         console.error('Error fetching discussions:', error);
         res.status(500).send('Error fetching discussions');
       }
     });
-    // Get all discussions
+    
+ 
     app.get('/api/discussions', async (req, res) => {
       try {
-        const discussions = await Discussion.find().populate('replies');
+        // Fetch all discussions, and populate user and replies
+        const discussions = await Discussion.find()
+          .populate('user')
+          .populate({
+            path: 'replies',
+            populate: {
+              path: 'user',
+            },
+          });
+    
         res.json(discussions);
       } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error fetching discussions:', error);
+        res.status(500).json({ message: 'Error fetching discussions' });
       }
     });
+    
+    // Update the route to fetch a single discussion by ID
+ 
+app.get('/api/discussions/:discussionId', async (req, res) => {
+  try {
+    const discussionId = req.params.discussionId;
+
+    // Find the discussion by ID, populate its user and replies
+    const discussion = await Discussion.findById(discussionId)
+      .populate('user')
+      .populate({
+        path: 'replies',
+        populate: {
+          path: 'user',
+        },
+      });
+
+    if (!discussion) {
+      return res.status(404).json({ message: 'Discussion not found' });
+    }
+
+    res.json(discussion);
+  } catch (error) {
+    console.error('Error fetching discussion:', error);
+    res.status(500).json({ message: 'Error fetching discussion' });
+  }
+});
+
+
 
     app.post('/api/discussions/:discussionId/replies', isLoggedIn, async (req, res) => {
       try {
@@ -185,49 +228,31 @@ mongoose.connect(atlasConnectionString, {
         if (!discussion) {
           return res.status(404).json({ message: 'Discussion not found' });
         }
-    
+
         const newReply = new Reply({
           content: req.body.content,
           user: req.user._id,
           discussion: discussion._id, // Use discussion._id to associate the reply with the discussion
         });
-    
+
         // Save the reply to the database
         await newReply.save();
-    
+
         req.user.replies.push(newReply);
         await req.user.save();
-    
+
         discussion.replies.push(newReply);
         await discussion.save();
-    
+
         res.status(201).json(newReply);
       } catch (error) {
         res.status(400).json({ message: error.message });
       }
     });
-     
 
 
-    app.delete('/api/discussions/:discussionId', async (req, res) => {
-      try {
-        const discussion = await Discussion.findByIdAndDelete(req.params.discussionId);
-        if (!discussion) {
-          return res.status(404).json({ message: 'Discussion not found' });
-        }
-         // Delete associated replies
-    for (const replyId of discussion.replies) {
-      await Reply.findByIdAndDelete(replyId);
-    }
-        res.status(200).json({ message: 'Discussion deleted successfully' });
-      } catch (error) {
-        console.error('Error deleting discussion:', error); // Log the actual error
-        res.status(500).json({ message: 'Error deleting discussion' });
-      }
-    });
 
-    // Route for handling likes for discussion
-    app.put('/api/likes/:discussionId', isLoggedIn, async (req, res) => {
+    app.delete('/api/discussions/:discussionId', isLoggedIn, async (req, res) => {
       try {
         const discussion = await Discussion.findById(req.params.discussionId);
     
@@ -235,8 +260,34 @@ mongoose.connect(atlasConnectionString, {
           return res.status(404).json({ message: 'Discussion not found' });
         }
     
-        const user = req.user;
+        // Check if the current user is the author of the discussion
+        if (discussion.user.toString() !== req.user._id.toString()) {
+          return res.status(403).json({ message: 'You are not authorized to delete this discussion' });
+        }
     
+        // Delete the discussion and associated replies
+        await Discussion.findByIdAndDelete(req.params.discussionId);
+        await Reply.deleteMany({ discussion: req.params.discussionId });
+    
+        res.status(200).json({ message: 'Discussion deleted successfully' });
+      } catch (error) {
+        console.error('Error deleting discussion:', error);
+        res.status(500).json({ message: 'Error deleting discussion' });
+      }
+    });
+    
+
+    // Route for handling likes for discussion
+    app.put('/api/likes/:discussionId', isLoggedIn, async (req, res) => {
+      try {
+        const discussion = await Discussion.findById(req.params.discussionId);
+
+        if (!discussion) {
+          return res.status(404).json({ message: 'Discussion not found' });
+        }
+
+        const user = req.user;
+
         // Check if the user has already liked this discussion
         if (user.likedDiscussions.includes(discussion._id)) {
           // If yes, remove the like
@@ -247,28 +298,28 @@ mongoose.connect(atlasConnectionString, {
           user.likedDiscussions.push(discussion._id);
           discussion.likes++;
         }
-    
+
         // Save the changes
         await user.save();
         await discussion.save();
-    
+
         res.json(discussion);
       } catch (error) {
         res.status(500).json({ message: 'Error updating likes' });
       }
     });
-    
+
     // Route for handling dislikes for discussion
     app.put('/api/dislikes/:discussionId', isLoggedIn, async (req, res) => {
       try {
         const discussion = await Discussion.findById(req.params.discussionId);
-    
+
         if (!discussion) {
           return res.status(404).json({ message: 'Discussion not found' });
         }
-    
+
         const user = req.user;
-    
+
         // Check if the user has already disliked this discussion
         if (user.dislikedDiscussions.includes(discussion._id)) {
           // If yes, remove the dislike
@@ -279,103 +330,103 @@ mongoose.connect(atlasConnectionString, {
           user.dislikedDiscussions.push(discussion._id);
           discussion.dislikes++;
         }
-    
+
         // Save the changes
         await user.save();
         await discussion.save();
-    
+
         res.json(discussion);
       } catch (error) {
         res.status(500).json({ message: 'Error updating dislikes' });
       }
     });
-    
-  
 
-   // Route for handling likes for replies
-   app.put('/api/likes/:replyId', isLoggedIn, async (req, res) => {
-    try {
-      const reply = await Reply.findById(req.params.replyId);
-  
-      if (!reply) {
-        return res.status(404).json({ message: 'Reply not found' });
+
+
+    // Route for handling likes for replies
+    app.put('/api/likes/:replyId', isLoggedIn, async (req, res) => {
+      try {
+        const reply = await Reply.findById(req.params.replyId);
+
+        if (!reply) {
+          return res.status(404).json({ message: 'Reply not found' });
+        }
+
+        const user = req.user;
+
+        // Check if the user has already liked this reply
+        if (user.likedReplies.includes(reply._id)) {
+          // If yes, remove the like
+          user.likedReplies.pull(reply._id);
+          reply.likes--;
+        } else {
+          // If no, add the like
+          user.likedReplies.push(reply._id);
+          reply.likes++;
+        }
+
+        // Save the changes
+        await user.save();
+        await reply.save();
+
+        res.json(reply);
+      } catch (error) {
+        res.status(500).json({ message: 'Error updating likes' });
       }
-  
-      const user = req.user;
-  
-      // Check if the user has already liked this reply
-      if (user.likedReplies.includes(reply._id)) {
-        // If yes, remove the like
-        user.likedReplies.pull(reply._id);
-        reply.likes--;
-      } else {
-        // If no, add the like
-        user.likedReplies.push(reply._id);
-        reply.likes++;
-      }
-  
-      // Save the changes
-      await user.save();
-      await reply.save();
-  
-      res.json(reply);
-    } catch (error) {
-      res.status(500).json({ message: 'Error updating likes' });
-    }
-  });
-  
-  // Similar route for disliking replies
-  
+    });
+
+    // Similar route for disliking replies
+
     // Route for handling dislikes for replies
     app.put('/api/dislikes/:replyId', isLoggedIn, async (req, res) => {
       try {
         const reply = await Reply.findById(req.params.replyId);
-    
+
         if (!reply) {
           return res.status(404).json({ message: 'Reply not found' });
         }
-    
+
         const updatedReply = await Reply.findByIdAndUpdate(
           req.params.replyId,
           { $inc: { dislikes: 1 } }, // Increment the dislikes count by 1
           { new: true } // Return the updated reply
         );
-    
+
         res.json(updatedReply);
       } catch (error) {
         res.status(500).json({ message: 'Error updating dislikes' });
       }
     });
-// Define a route to get a user's profile by username
-app.get('/:username', async (req, res) => {
-  try {
-      const { username } = req.params; // Extract the username from the URL parameters
+    // Define a route to get a user's profile by username
+    app.get('/:username', async (req, res) => {
+      try {
+        const { username } = req.params; // Extract the username from the URL parameters
 
-      // Find the user by their username
-      const user = await User.findOne({ username });
+        // Find the user by their username
+        const user = await User.findOne({ username });
 
-      if (!user) {
+        if (!user) {
           // If the user doesn't exist, return a 404 response
           return res.status(404).json({ error: 'User not found' });
-      }
+        }
 
-      // Fetch discussions related to the user and populate their replies
-      const discussions = await Discussion.find({ user: user._id })
+        // Fetch discussions related to the user and populate their replies
+        const discussions = await Discussion.find({ user: user._id })
           .populate('replies')
           .exec();
 
-      // Render the 'user.ejs' template with the user and discussions data
-      res.render('user', { user, discussions });
-  } catch (error) {
-      // Handle any errors that occur during data fetching
-      console.error('Error fetching user data:', error);
-      res.status(500).json({ error: 'Internal server error' });
-  }
-});
+        // Render the 'user.ejs' template with the user and discussions data
+        res.render('user', { user, discussions });
+      } catch (error) {
+        // Handle any errors that occur during data fetching
+        console.error('Error fetching user data:', error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
+    });
 
 
 
-    // ...
+    // starting server
 
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);

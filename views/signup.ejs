@@ -1,36 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/photos/brand/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/photos/brand/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
   <link rel="stylesheet" href="../assets/css/login.css">
   <link rel="stylesheet" href="../assets/css/style.css">
-  <title>Login to Dizcuss</title>
-</head>
-<body>
+  <title>Signup on Dizcuss</title>
 </head>
 
 <body>
-  <%- include('sidebar', { currentPage: 'Signup' }) %>
-  <div class="login-container">
-    <div class="form-container">
-      <p class="title">Signup</p>
-      <form class="form" action="/signup" method="POST">
-        <div class="input-group">
-          <label for="username">Username</label>
-          <input type="text" name="username" placeholder="Username" required>
+  </head>
+
+  <body>
+    <%- include('sidebar', { currentPage: 'Signup' }) %>
+      <div class="login-container">
+        <div class="form-container">
+          <p class="title">Signup</p>
+          <form class="form" id="form" action="/signup" method="POST">
+            <div class="input-group">
+              <label for="username">Username</label>
+              <input type="text" name="username" placeholder="Username" id="username" required>
+              <i class="fas fa-check-circle"></i>
+              <i class="fas fa-exclamation-circle"></i>
+              <small>Error message</small>
+            </div>
+            <div class="input-group">
+              <label for="password">Password</label>
+              <input type="password" name="password" placeholder="Password" id="password" required>
+              <i class="fas fa-check-circle"></i>
+              <i class="fas fa-exclamation-circle"></i>
+              <small>Error message</small>
+            </div><br>
+            <div class="input-group">
+              <label for="confirm-password">Confirm Password</label>
+              <input type="password" name="confirm-password" placeholder="Password" id="password2" required>
+              <i class="fas fa-check-circle"></i>
+              <i class="fas fa-exclamation-circle"></i>
+              <small>Error message</small>
+            </div><br>
+            <button class="sign">Signup</button>
+          </form>
+          <br>
+          <p class="signup">Already have an account?
+            <a rel="noopener noreferrer" href="/login" class="">Login</a>
+          </p>
         </div>
-        <div class="input-group">
-          <label for="password">Password</label>
-          <input type="password" name="password" placeholder="Password" required>
-        </div><br>
-        <button class="sign">Signup</button>
-      </form>
-      <br>
-      <p class="signup">Already have an account?
-        <a rel="noopener noreferrer" href="/login" class="">Login</a>
-      </p>
-    </div>
-  </div>
-</body>
+      </div>
+      <script>
+
+        // signup form validation
+        const form = document.getElementById('form');
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const password2 = document.getElementById('password2');
+
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+
+          checkInputs();
+        });
+
+        function checkInputs() {
+          // trim to remove the whitespaces
+          const usernameValue = username.value.trim();
+          const passwordValue = password.value.trim();
+          const password2Value = password2.value.trim();
+
+          if (usernameValue === '') {
+            setErrorFor(username, 'Username cannot be blank');
+          } else {
+            setSuccessFor(username);
+          }
+
+          if (passwordValue === '') {
+            setErrorFor(password, 'Password cannot be blank');
+          } else {
+            setSuccessFor(password);
+          }
+
+          if (password2Value === '') {
+            setErrorFor(password2, 'Password2 cannot be blank');
+          } else if (passwordValue !== password2Value) {
+            setErrorFor(password2, 'Passwords does not match');
+          } else {
+            setSuccessFor(password2);
+          }
+        }
+
+        function setErrorFor(input, message) {
+          const formControl = input.parentElement;
+          const small = formControl.querySelector('small');
+          formControl.className = 'form-control error';
+          small.innerText = message;
+        }
+
+        function setSuccessFor(input) {
+          const formControl = input.parentElement;
+          formControl.className = 'form-control success';
+        }
+      </script>
+  </body>
+
 </html>

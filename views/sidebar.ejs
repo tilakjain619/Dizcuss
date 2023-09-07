@@ -1,8 +1,10 @@
-<link rel="stylesheet" href="../assets/css/sidebar.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
+<head>
+    <link rel="stylesheet" href="../assets/css/sidebar.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
+</head>
 <header>
     <div class="toggle">
         <i class="fas fa-bars"></i>
@@ -10,7 +12,7 @@
     <h3>
         <%= currentPage %>
     </h3>
-    <a href="#">
+    <a href="/logout">
         <i class="fas fa-sign-out-alt"></i>
     </a>
 </header>
@@ -45,27 +47,5 @@
         </li>
     </ul>
 </nav>
-<script>
-    let getSidebar = document.querySelector('nav');
-    document.addEventListener('DOMContentLoaded', function () {
-        let getToggle = document.getElementsByClassName('toggle');
-        for (let i = 0; i < getToggle.length; i++) {
-            getToggle[i].addEventListener('click', function () {
-                getSidebar.classList.toggle('active');
-            });
-        }
-    });
-    function updateSidebarState() {
-      if (window.innerWidth > 1100) {
-        getSidebar.classList.add('active');
-      } else {
-        getSidebar.classList.remove('active');
-      }
-    }
-
-    // Add initial active class based on screen size on page load
-    updateSidebarState();
-</script>
-
+<script src="../assets/js/script.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  

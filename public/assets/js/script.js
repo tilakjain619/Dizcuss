@@ -1,10 +1,22 @@
-let mainNav = document.getElementById("js-menu");
-let navBarToggle = document.getElementById("js-navbar-toggle");
+let getSidebar = document.querySelector('nav');
+    document.addEventListener('DOMContentLoaded', function () {
+        let getToggle = document.getElementsByClassName('toggle');
+        for (let i = 0; i < getToggle.length; i++) {
+            getToggle[i].addEventListener('click', function () {
+                getSidebar.classList.toggle('active');
+            });
+        }
+    });
+    function updateSidebarState() {
+        if (window.innerWidth > 1100) {
+            getSidebar.classList.add('active');
+        } else {
+            getSidebar.classList.remove('active');
+        }
+    }
 
-navBarToggle.addEventListener("click", function() {
-  mainNav.classList.toggle("active");
-});
-
+    // Add initial active class based on screen size on page load
+    updateSidebarState();
 //  Initialize Swiper
 let swiper = new Swiper(".mySwiper", {
   effect: "cards",
