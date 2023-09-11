@@ -100,14 +100,32 @@
     font-size: 13px;
     text-align: center;
 }
-
+/* trending discussions container frame */
+.most-trending-discussion-container{
+    width: 18%;
+    top: 2.5rem;
+    position: fixed;
+    right: 2rem;
+    height: 100%;
+    /* z-index: -1; */
+}
+@media (max-width: 1320px){
+    .most-trending-discussion-container{
+        display: none;
+    }
+}
 /* discussions */
 .discussion-container{
     padding: 2rem 0;
 }
 .discussion-card{
-    margin: 1rem 0;
+    margin: 2rem 0;
     position: relative;
+}
+.discussion-title{
+    padding: 6px 0;
+    font-family: poppins, sans-serif;
+    font-size: 15px;
 }
 .discussion-time{
     font-size: 13px;
@@ -124,12 +142,16 @@
     font-size: 13px;
     color: #959595;
 }
+.discussion-toolbar{
+    display: flex;
+    gap: 10px;
+}
 .discussion-btn{
     background: transparent;
     border: 1px solid transparent;
     outline: none;
-    color: #fdfdfd;
-    padding: 4px;
+    color: #979797;
+    padding: 4px 0;
 }
 
 /* liked and disliked states */
@@ -138,27 +160,4 @@
 }
 .disliked{
     color: red;
-}
-
-/* popup to show discussion */
-.popup{
-    backdrop-filter: blur(2px);
-    display: block;
-    position: fixed;
-    height: 100%;
-    top: 0;
-    width: 100%;
-    background: #000000e6;
-    padding: 1rem;
-    animation: popup .3s 1;
-}
-.close-popup{
-    font-size: 20px;
-    border-radius: 50%;
-    background: #c8c8c82e;
-    width: 34px;
-    height: 34px;
-    display: grid;
-    place-content: center;
-    float: right;
 }

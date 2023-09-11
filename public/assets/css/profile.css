@@ -1,5 +1,11 @@
-.profile-box{
-    background-color: rgba(17, 24, 39, 1);
-    padding: 1rem;
-    margin: 1rem 0;
+.greet-username{
+    text-transform: capitalize;
+}
+.profile-btn{
+    display: flex;
+    gap: 8px;
+}
+input:disabled, button:disabled{
+    opacity: .5;
+    cursor: unset;
 }

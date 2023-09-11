@@ -9,6 +9,12 @@
   <link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
   <link rel="stylesheet" href="../assets/css/login.css">
   <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/sidebar.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
   <title>Signup on Dizcuss</title>
 </head>
 
@@ -16,7 +22,42 @@
   </head>
 
   <body>
-    <%- include('sidebar', { currentPage: 'Signup' }) %>
+    <header>
+      <div class="toggle">
+          <i class="fas fa-bars"></i>
+      </div>
+      <h3>
+          Signup
+      </h3>
+      <a href="/login">
+        <i class="fas fa-sign-in-alt"></i>
+      </a>
+  </header>
+  <nav>
+      <ul>
+          <li class="d-logo">
+              <img src="../assets/photos/brand/favicon-32x32.png" alt="our logo">
+          </li>
+          <li>
+              <a class="toggle">
+                  <span class="icon"><i class="fas fa-bars"></i></span>
+                  <span class="title">Menu</span>
+              </a>
+          </li>
+          <li>
+              <a href="/home">
+                  <span class="icon"><i class="fas fa-home"></i></span>
+                  <span class="title">Home</span>
+              </a>
+          </li>
+          <li>
+              <a href="/login">
+                  <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+                  <span class="title">Log In</span>
+              </a>
+          </li>
+      </ul>
+  </nav>
       <div class="login-container">
         <div class="form-container">
           <p class="title">Signup</p>
@@ -24,23 +65,10 @@
             <div class="input-group">
               <label for="username">Username</label>
               <input type="text" name="username" placeholder="Username" id="username" required>
-              <i class="fas fa-check-circle"></i>
-              <i class="fas fa-exclamation-circle"></i>
-              <small>Error message</small>
             </div>
             <div class="input-group">
               <label for="password">Password</label>
               <input type="password" name="password" placeholder="Password" id="password" required>
-              <i class="fas fa-check-circle"></i>
-              <i class="fas fa-exclamation-circle"></i>
-              <small>Error message</small>
-            </div><br>
-            <div class="input-group">
-              <label for="confirm-password">Confirm Password</label>
-              <input type="password" name="confirm-password" placeholder="Password" id="password2" required>
-              <i class="fas fa-check-circle"></i>
-              <i class="fas fa-exclamation-circle"></i>
-              <small>Error message</small>
             </div><br>
             <button class="sign">Signup</button>
           </form>
@@ -50,59 +78,7 @@
           </p>
         </div>
       </div>
-      <script>
-
-        // signup form validation
-        const form = document.getElementById('form');
-        const username = document.getElementById('username');
-        const password = document.getElementById('password');
-        const password2 = document.getElementById('password2');
-
-        form.addEventListener('submit', e => {
-          e.preventDefault();
-
-          checkInputs();
-        });
-
-        function checkInputs() {
-          // trim to remove the whitespaces
-          const usernameValue = username.value.trim();
-          const passwordValue = password.value.trim();
-          const password2Value = password2.value.trim();
-
-          if (usernameValue === '') {
-            setErrorFor(username, 'Username cannot be blank');
-          } else {
-            setSuccessFor(username);
-          }
-
-          if (passwordValue === '') {
-            setErrorFor(password, 'Password cannot be blank');
-          } else {
-            setSuccessFor(password);
-          }
-
-          if (password2Value === '') {
-            setErrorFor(password2, 'Password2 cannot be blank');
-          } else if (passwordValue !== password2Value) {
-            setErrorFor(password2, 'Passwords does not match');
-          } else {
-            setSuccessFor(password2);
-          }
-        }
-
-        function setErrorFor(input, message) {
-          const formControl = input.parentElement;
-          const small = formControl.querySelector('small');
-          formControl.className = 'form-control error';
-          small.innerText = message;
-        }
-
-        function setSuccessFor(input) {
-          const formControl = input.parentElement;
-          formControl.className = 'form-control success';
-        }
-      </script>
+      <script src="../assets/js/script.js"></script>
   </body>
 
 </html>

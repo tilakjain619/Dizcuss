@@ -9,6 +9,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="../assets/css/login.css">
   <link rel="stylesheet" href="../assets/css/profile.css">
   <title>User Profile</title>
 </head>
@@ -17,21 +18,56 @@
   <%- include('sidebar', { currentPage: 'User Profile' }) %>
 
     <div class="home-container">
-      <h2>Welcome, <%= user.username %>!</h2>
-    <div class="profile-box">
-      <h3>Profile Information</h3>
-      <form action="/update-profile" onsubmit="showToast('Profile edited!')" method="POST">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" value="<%= user.username %>">
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" value="<%= user.password %>">
-        <br>
-        <button type="submit">Edit Profile</button>
+      <h2>Welcome, <span class="greet-username"><%= user.username %></span>!</h2>
+    <div class="login-container">
+      <div class="form-container">
+        <p class="title">Profile</p>
+      <form action="/update-profile" onsubmit="showToast('Profile edited!')" class="form" method="POST">
+        <div class="input-group">
+          <label for="username">Username:</label>
+        <input type="text" id="username" name="username" value="<%= user.username %>" disabled>
+        </div>
+        <div class="input-group">
+          <label for="password">Password:</label>
+        <input type="password" id="password" name="password" value="<%= user.password %>" disabled>
+        </div><br>
+        <div class="profile-btn">
+          <button type="button" class="sign" id="editProfileButton">Edit Profile</button>
+        <button type="submit" class="sign" id="saveProfileButton" disabled>Save</button>
+        </div>
       </form>
+      </div>
     </div>
     </div>
+    <script>
+      // profile edit disable-enable
+const editProfileButton = document.getElementById('editProfileButton');
+  const saveProfileButton = document.getElementById('saveProfileButton');
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
 
+  // Flag to track the state (enabled or disabled)
+  let isEditing = false;
+
+  // Add a click event listener to the "Edit Profile" button
+  editProfileButton.addEventListener('click', () => {
+    if (isEditing) {
+      // If currently editing, disable the form elements
+      usernameInput.setAttribute('disabled', true);
+      passwordInput.setAttribute('disabled', true);
+      saveProfileButton.setAttribute('disabled', true);
+      editProfileButton.textContent = "Edit Profile";
+      isEditing = false;
+    } else {
+      // If not currently editing, enable the form elements
+      usernameInput.removeAttribute('disabled');
+      passwordInput.removeAttribute('disabled');
+      saveProfileButton.removeAttribute('disabled');
+      editProfileButton.textContent = "Cancel";
+      isEditing = true;
+    }
+  });
+    </script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="../assets/js/app.js"></script>
     <script src="../assets/js/script.js"></script>

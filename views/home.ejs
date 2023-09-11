@@ -16,6 +16,7 @@
 
 <body>
     <%- include('sidebar', { currentPage: 'Home'}) %>
+    <iframe src="../trending.html" class="most-trending-discussion-container" frameborder="0"></iframe>
         <div class="home-container">
             <section id="create-discussion">
                 <form id="discussion-form">
@@ -47,29 +48,41 @@
                 <% discussions.forEach(discussion=> { %>
                     <%
                     const createdAt = new Date(discussion.createdAt);
-            const formattedTimestamp = formatTimestamp(createdAt); %>
+            const formattedTimestamp = formatTimestamp(createdAt); 
+            // Get the count of replies for this discussion
+            const replyCount = discussion.replies.length;
+            %>
                     <div class="discussion-card">
+                        <a href="/member/<%= discussion.user.username %>">
                         <p class="user-name">
                             @<%= discussion.user.username %>
                         </p>
+                    </a>
+                        <a href="/discussion/<%= discussion._id %>">
                         <p class="discussion-title" data-id="<%= discussion._id %>">
                             <%= discussion.content %>
                         </p>
+                    </a>
                         <p class="discussion-time"><%= formattedTimestamp %></p>
-                        <button class="reply-button discussion-btn" data-id="<%= discussion._id %>">Reply</button> &CenterDot;
-                        <button class="like-discussion-button discussion-btn" data-id="<%= discussion._id %>">
-                            <i class="fa fa-thumbs-up" aria-hidden="true"></i>
-                            <span class="count">
-                                <%= discussion.likes %>
-                            </span>
-                        </button>
-                        <button class="dislike-discussion-button discussion-btn" data-id="<%= discussion._id %>">
-                            <i class="fa fa-thumbs-down" aria-hidden="true"></i>
-                            <%= discussion.dislikes %>
-                        </button>
-                        <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button>
+                        <div class="discussion-toolbar">
+                        <a class="reply-button discussion-btn" href="/discussion/<%= discussion._id %>"><%= replyCount %> Replies</a>
+                            <button class="like-discussion-button discussion-btn" data-id="<%= discussion._id %>">
+                                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                <span class="count">
+                                    <%= discussion.likes %>
+                                </span>
+                            </button>
+                            <button class="dislike-discussion-button discussion-btn" data-id="<%= discussion._id %>">
+                                <i class="fa fa-thumbs-down" aria-hidden="true"></i>
+                                <%= discussion.dislikes %>
+                            </button>
+                            <!-- <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button> -->
+                            <% if (user && user._id.toString() === discussion.user._id.toString()) { %>
+                                <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button>
+                            <% } %>
+                        </div>
                     </div>
-                    <!-- show replies on feed -->
+                    <!-- hidden: replies on feed -->
                     <!-- <div class="reply-card">
                         <% discussion.replies.forEach(reply=> { %>
                             <div>
@@ -88,8 +101,7 @@
                     </div> -->
                     <% }); %>
             </div>
-
-            <div id="myModal" class="modal" style="display: none;">
+            <!-- <div id="myModal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <span class="close">&times;</span>
                     <h4>Reply</h4>
@@ -97,7 +109,7 @@
                     <p class="error-message"></p>
                     <button id="submitReply" class="submit-button">Submit</button>
                 </div>
-            </div>
+            </div> -->
         </div>
         
         <div id="popup" class="popup" style="display: none;">

@@ -137,5 +137,12 @@
 </body>
 <script src="./assets/js/script.js"></script>
 <script src="./assets/js/app.js" type="text/javascript"></script>
+<script>
+    let mainNav = document.getElementById("js-menu");
+let navBarToggle = document.getElementById("js-navbar-toggle");
 
+navBarToggle.addEventListener("click", function() {
+  mainNav.classList.toggle("show-active");
+});
+</script>
 </html>

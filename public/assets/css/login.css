@@ -4,7 +4,8 @@
     place-items: center;
 }
 .form-container {
-    width: 320px;
+  width: 100%;
+    max-width: 320px;
     border-radius: 0.75rem;
     background-color: rgba(17, 24, 39, 1);
     padding: 2rem;

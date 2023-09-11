@@ -1,0 +1,107 @@
+.discussion-user{
+    width: 100%;
+    background: var(--yellow);
+    color: #000;
+    padding: 10px;
+    position: relative;
+    display: grid;
+    height: 50px;
+    align-items: center;
+    border-radius: 4px;
+    margin: 4px 0;
+}
+.discussion-username{
+    font-weight: 600;
+}
+.discussion-time{
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    font-size: 13px;
+    color: #474747;
+}
+.discussion-content{
+    padding: 20px 0;
+    font-family: poppins, sans-serif;
+    font-size: clamp(14px, 15px, 17px);
+    color: #c9c9c9;
+}
+.reply-component{
+    position: relative;
+    padding: 6px 0;
+    margin: 10px 0;
+}
+.reply-username{
+    margin: 4px 0;
+    color: #898989;
+    font-size: 15px;
+}
+.reply-time{
+    position: absolute;
+    right: 2px;
+    font-size: 13px;
+    color: grey;
+    top: 8px;
+}
+.reply-content{
+    margin: 2px 0;
+}
+/* add reply component */
+.reply-form-group{
+    width: 100%;
+    box-shadow: 0px -16px 20px 10px #000000fc;
+}
+.add-reply-input{
+    width: 100%;
+    background: var(--black);
+    outline: none;
+    border: 1px solid #ffffff94;
+    font-size: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    z-index: 2;
+    height: 4rem;
+    resize: none;
+    color: rgb(242, 242, 242);
+    transition: height .2s;
+}
+.reply-form-toolbar{
+    display: none;
+    transition: 1s;
+}
+.reply-form-touser{
+    font-size: 13px;
+    padding: 4px 0;
+}
+.reply-form-touser a{
+    color: var(--blue);
+}
+.add-reply-input:valid ~ .reply-form-toolbar{
+    display: flex;
+    /* align-content: center; */
+    justify-content: start;
+    padding: 10px 0;
+    gap: 1rem;
+    align-items: center;
+}
+.add-reply-btn {
+	background:linear-gradient(to bottom, #fccb06 5%, #fccb06 100%);
+	background-color:#fccb06;
+	border-radius:28px;
+	border:1px solid #fccb06;
+	display:inline-block;
+	cursor:pointer;
+	color:#000;
+	font-size:15px;
+	font-weight:bold;
+	padding:10px 21px;
+	text-decoration:none;
+}
+.add-reply-btn:hover {
+	background:linear-gradient(to bottom, #fccb06 5%, #fccb06 100%);
+	background-color:#fccb06;
+}
+.add-reply-btn:active {
+	position:relative;
+	top:1px;
+}
