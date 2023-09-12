@@ -1,5 +1,5 @@
 const discussionsContainer = document.getElementById('discussions');
-const modal = document.getElementById('myModal');
+// const modal = document.getElementById('myModal');
 const span = document.getElementsByClassName('close')[0];
 const replyContentInput = document.getElementById('replyContent');
 const submitReplyButton = document.getElementById('submitReply');
@@ -46,23 +46,41 @@ const showToast = (toastMessage) => {
 }
 
 // ...
-async function fetchDiscussions() {
+async function fetchDiscussions(user) {
     discussionsContainer.innerHTML = '';
     
     try {
+        window.location.reload()
         const response = await fetch('/api/discussions');
         discussions = await response.json();
-        
+        // Reverse the discussions array to show most recent discussions first
+        discussions.reverse();
         discussions.forEach(discussion => {
             const discussionElement = document.createElement('div');
             const createdAt = new Date(discussion.createdAt);
             const formattedTimestamp = formatTimestamp(createdAt);
+            // Get the count of replies for this discussion
+            const replyCount = discussion.replies.length;
+
+            let deleteButtonHTML = '';
+
+            if (user && user._id.toString() === discussion.user._id.toString()) {
+                deleteButtonHTML = `<button class="delete-discussion-button discussion-btn" data-id="${discussion._id}">Delete</button>`;
+            }        
+            
             discussionElement.innerHTML = `
             <div class="discussion-card">
+            <a href="/member/${discussion.user.username}">
                 <p class="user-name">@${discussion.user.username}</p>
-                <p class="discussion-title" data-id="${discussion._id}">${discussion.content}</p>
+                </a>
+                <a href="/discussion/${discussion._id}">
+                        <p class="discussion-title" data-id="${discussion._id}">
+                            ${discussion.content}
+                        </p>
+                    </a>
                 <p class="discussion-time">${formattedTimestamp}</p>
-                <button class="reply-button discussion-btn" data-id="${discussion._id}">Reply</button>
+                <div class="discussion-toolbar">
+                <a class="reply-button discussion-btn" href="/discussion/${discussion._id}"><p class="reply-count">${replyCount} Replies</p></a>
                 <button class="like-discussion-button discussion-btn" data-id="${discussion._id}">
                             <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                             <span class="count">
@@ -73,7 +91,8 @@ async function fetchDiscussions() {
                         <i class="fa fa-thumbs-down" aria-hidden="true"></i>
                         ${discussion.dislikes}
                     </button>
-                    <button class="delete-discussion-button discussion-btn" data-id="${discussion._id}">Delete</button>
+                    ${deleteButtonHTML}
+                    </div>
             </div>
             `;
             // show replies on feed -------------
@@ -177,9 +196,6 @@ discussionsContainer.addEventListener('click', event => {
         handleLikeDislike(event, true);
     } else if (event.target.classList.contains('dislike-discussion-button')) {
         handleLikeDislike(event, false);
-    } else if (event.target.classList.contains('reply-button')) {
-        currentDiscussionId = event.target.getAttribute('data-id');
-        modal.style.display = 'grid';
     }
     else if (event.target.classList.contains('delete-discussion-button')) {
         const discussionId = event.target.getAttribute('data-id');
@@ -190,46 +206,36 @@ discussionsContainer.addEventListener('click', event => {
     }
 });
 
-span.addEventListener('click', () => {
-    modal.style.display = 'none';
-});
+// submitReplyButton.addEventListener('click', async () => {
+//     const content = replyContentInput.value;
+//     if (content.trim() === '') {
+//         alert('Please enter a valid reply content.');
+//         return;
+//     }
 
-window.addEventListener('click', event => {
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
-});
+//     const newReply = {
+//         content
+//     };
 
-submitReplyButton.addEventListener('click', async () => {
-    const content = replyContentInput.value;
-    if (content.trim() === '') {
-        alert('Please enter a valid reply content.');
-        return;
-    }
+//     try {
+//         const response = await fetch(`/api/discussions/${currentDiscussionId}/replies`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify(newReply)
+//         });
 
-    const newReply = {
-        content
-    };
-
-    try {
-        const response = await fetch(`/api/discussions/${currentDiscussionId}/replies`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(newReply)
-        });
-
-        if (response.ok) {
-            modal.style.display = 'none';
-            fetchDiscussions();
-        } else {
-            alert('Error adding reply');
-        }
-    } catch (error) {
-        console.error('Error adding reply:', error);
-    }
-});
+//         if (response.ok) {
+//             modal.style.display = 'none';
+//             fetchDiscussions();
+//         } else {
+//             alert('Error adding reply');
+//         }
+//     } catch (error) {
+//         console.error('Error adding reply:', error);
+//     }
+// });
 
 
 // ...
@@ -289,14 +295,6 @@ discussionsContainer.addEventListener('click', event => {
 
 // ...
 
-
-
-window.addEventListener('click', event => {
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
-});
-
 const discussionForm = document.getElementById('discussion-form');
 
 
@@ -344,12 +342,36 @@ async function deleteDiscussion(discussionId) {
             showToast("Discussion deleted")
             fetchDiscussions(); // Refresh discussions after deletion
         } else {
-            alert('Error deleting discussion');
+            showToast('Error deleting discussion');
         }
     } catch (error) {
         console.error('Error deleting discussion:', error);
     }
 }
+// Add an event listener to the delete-reply button
+// Example event listener for delete buttons within replies
+
+//------------
+async function deleteReply(replyId) {
+    try {
+        const response = await fetch(`/api/replies/${replyId}`, {
+            method: 'DELETE'
+        });
+
+        if (response.ok) {
+            showToast("Reply deleted");
+            window.location.reload()
+        } else {
+            showToast('Error deleting reply');
+        }
+    } catch (error) {
+        console.error('Error deleting reply:', error);
+    }
+}
+
+
+
+//-------------------
 async function fetchUserData(username) {
     try {
         const response = await fetch(`/${username}`); // Assuming you have an API endpoint for fetching user data

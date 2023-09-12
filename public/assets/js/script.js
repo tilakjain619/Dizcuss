@@ -1,3 +1,5 @@
+
+
 let getSidebar = document.querySelector('nav');
     document.addEventListener('DOMContentLoaded', function () {
         let getToggle = document.getElementsByClassName('toggle');
@@ -8,7 +10,7 @@ let getSidebar = document.querySelector('nav');
         }
     });
     function updateSidebarState() {
-        if (window.innerWidth > 1100) {
+        if (window.innerWidth > 1400) {
             getSidebar.classList.add('active');
         } else {
             getSidebar.classList.remove('active');

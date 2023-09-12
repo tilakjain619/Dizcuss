@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/discussion.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/photos/brand/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/photos/brand/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= discussion.user.username %> | Dizcuss
+    </title>
+</head>
+<%- include('sidebar', { currentPage: 'Discussion' }) %>
+
+    <body>
+        <div class="home-container">
+
+            <% function formatTimestamp(createdAt) { const now=new Date(); const diffInMilliseconds=now - createdAt; if
+                (diffInMilliseconds < 60000) { return `${Math.floor(diffInMilliseconds / 1000)} seconds ago`; } else if
+                (diffInMilliseconds < 3600000) { return `${Math.floor(diffInMilliseconds / 60000)} minutes ago`; } else
+                if (diffInMilliseconds < 86400000) { return `${Math.floor(diffInMilliseconds / 3600000)} hours ago`; }
+                else { return `${Math.floor(diffInMilliseconds / 86400000)} days ago`; } } %>
+                <% const createdAt=new Date(discussion.createdAt); const formattedTimestamp=formatTimestamp(createdAt);
+                    %>
+                    <div class="discussion-user"><a href="/member/<%= discussion.user.username %>"><span
+                                class="discussion-username">@<%= discussion.user.username %>
+                            </span></a>
+                        <p class="discussion-time">
+                            <%= formattedTimestamp %>
+                        </p>
+                    </div>
+                    <p class="discussion-content">
+                        <%= discussion.content %>
+                    </p>
+
+                    <hr>
+                    <div class="reply-form-group">
+                        <form action="/discussion/<%= discussion._id %>/replies" method="post">
+                            <textarea id="replyContent" name="content" class="add-reply-input" placeholder="Add reply.."
+                                required></textarea>
+                            <input type="hidden" name="discussionId" value="<%= discussion._id %>">
+                            <div class="reply-form-toolbar">
+                                <button type="submit" class="add-reply-btn">Reply</button>
+                                <span class="reply-form-touser">Replying to <a
+                                        href="/member/<%= discussion.user.username %>" target="_blank">@<%=
+                                            discussion.user.username %></a></span>
+                            </div>
+                        </form>
+                    </div>
+                    <ul>
+                        <% discussion.replies.forEach((reply)=> { %>
+                            <% const createdAt=new Date(reply.createdAt); const
+                                formattedTimestampReply=formatTimestamp(createdAt); %>
+                                <li class="reply-component">
+                                    <a href="/member/<%= reply.user.username %>">
+                                        <p class="reply-username">
+                                            @<%= reply.user.username %>
+                                        </p>
+                                    </a>
+                                    <p class="reply-time">
+                                        <%= formattedTimestampReply %>
+                                    </p>
+                                    <p class="reply-content">
+                                        <%= reply.content %>
+                                    </p>
+                                    <% if (user && user._id.toString()===reply.user._id.toString()) { %>
+                                        <button class="delete-reply-button discussion-btn"
+                                            data-id="<%= reply._id %>">Delete</button>
+                                        <% } %>
+                                            <!-- You can display more details about each reply as needed -->
+                                </li>
+                                <% }); %>
+                    </ul>
+        </div>
+        <script>
+            const deleteButtons = document.querySelectorAll(".delete-reply-button");
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const replyId = event.target.getAttribute('data-id');
+                    const confirmDelete = confirm('Are you sure you want to delete this reply?');
+                    if (confirmDelete) {
+                        deleteReply(replyId);
+                    }
+                });
+            });
+        </script>
+        <script src="../assets/js/app.js"></script>
+    </body>
