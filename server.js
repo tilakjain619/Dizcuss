@@ -10,10 +10,10 @@ const passportLocalMongoose = require('passport-local-mongoose');
 require('dotenv').config();
 
 // atlas connection
-// const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
+const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
 // local connection
-const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
+// const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -151,7 +151,7 @@ const replySchema = new mongoose.Schema({
 const Discussion = mongoose.model('Discussion', discussionSchema);
 const Reply = mongoose.model('Reply', replySchema);
 
-mongoose.connect(mongoURI, {
+mongoose.connect(atlasConnectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -265,7 +265,7 @@ app.get('/api/trending', async (req, res) => {
           }
   
           // Render the 'discussion.ejs' template with the discussion and its replies
-          res.render('discussion', { discussion });
+          res.render('discussion', { discussion, user: req.user });
       } catch (error) {
           console.error('Error fetching discussion:', error);
           res.status(500).json({ message: 'Error fetching discussion' });
@@ -280,7 +280,8 @@ app.get('/api/trending', async (req, res) => {
       const discussionId = req.params.discussionId;
   
       // Find the discussion by its ID
-      const discussion = await Discussion.findById(discussionId);
+      const discussion = await Discussion.findById(discussionId)
+      .populate('user')
   
       if (!discussion) {
         return res.status(404).json({ message: 'Discussion not found' });
@@ -343,27 +344,27 @@ app.get('/api/trending', async (req, res) => {
     // Route to delete replies
     app.delete('/api/replies/:replyId', isLoggedIn, async (req, res) => {
       try {
-        const reply = await Reply.findById(req.params.replyId);
-    
-        if (!reply) {
-          return res.status(404).json({ message: 'Reply not found' });
-        }
-    
-        // Check if the current user is the author of the discussion
-        if (reply.user.toString() !== req.user._id.toString()) {
-          return res.status(403).json({ message: 'You are not authorized to delete this Reply' });
-        }
-    
-        // Delete the discussion and associated replies
-        await Reply.findByIdAndDelete(req.params.replyId);
-        await Reply.deleteMany({ reply: req.params.replyId });
-    
-        res.status(200).json({ message: 'Reply deleted successfully' });
+          const reply = await Reply.findById(req.params.replyId);
+  
+          if (!reply) {
+              return res.status(404).json({ message: 'Reply not found' });
+          }
+  
+          // Check if the current user is the author of the reply
+          if (reply.user.toString() !== req.user._id.toString()) {
+              return res.status(403).json({ message: 'You are not authorized to delete this reply' });
+          }
+  
+          // Delete the reply
+          await Reply.findByIdAndDelete(req.params.replyId);
+  
+          res.status(200).json({ message: 'Reply deleted successfully' });
       } catch (error) {
-        console.error('Error deleting Reply:', error);
-        res.status(500).json({ message: 'Error deleting Reply' });
+          console.error('Error deleting reply:', error);
+          res.status(500).json({ message: 'Error deleting reply' });
       }
-    });
+  });
+  
     //----------
     // Route for handling likes for discussion
     app.put('/api/likes/:discussionId', isLoggedIn, async (req, res) => {

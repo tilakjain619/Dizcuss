@@ -348,30 +348,29 @@ async function deleteDiscussion(discussionId) {
         console.error('Error deleting discussion:', error);
     }
 }
+// Add an event listener to the delete-reply button
+// Example event listener for delete buttons within replies
+
 //------------
-async function deleteReply(replyId, user) {
+async function deleteReply(replyId) {
     try {
         const response = await fetch(`/api/replies/${replyId}`, {
             method: 'DELETE'
         });
 
         if (response.ok) {
-            showToast("Reply deleted")
-            fetchDiscussions(); // Refresh discussions after deletion
+            showToast("Reply deleted");
+            window.location.reload()
         } else {
-            showToast('Error deleting Reply');
+            showToast('Error deleting reply');
         }
     } catch (error) {
-        console.error('Error deleting Reply:', error);
+        console.error('Error deleting reply:', error);
     }
 }
-document.getElementById("delete-reply").addEventListener('click', () =>{
-    const replyId = event.target.getAttribute('data-id');
-        const confirmDelete = confirm('Are you sure you want to delete this Reply?');
-        if (confirmDelete) {
-            deleteReply(replyId);
-        }
-})
+
+
+
 //-------------------
 async function fetchUserData(username) {
     try {
