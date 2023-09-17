@@ -34,6 +34,7 @@ li {
 /* setting color theme */
 :root {
     --yellow: #fccb06;
+    --dark: rgb(22, 24, 28);
     --black: #000;
     --blue: #b1ddf1;
     /* use for box/text shadow */
