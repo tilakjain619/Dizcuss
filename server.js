@@ -10,10 +10,10 @@ const passportLocalMongoose = require('passport-local-mongoose');
 require('dotenv').config();
 
 // atlas connection
-const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
+// const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
 // local connection
-// const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
+const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -33,6 +33,9 @@ app.use(passport.session());
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
+  gender: String,
+  fullName: String,
+  birthDate: Date,
   likedDiscussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
   dislikedDiscussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
   likedReplies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }],
@@ -72,9 +75,13 @@ app.post('/signup', async (req, res) => {
       return res.status(400).json({ message: 'Username already taken' });
     }
 
-    // Create a new user
-    const { username, password } = req.body;
-    const newUser = new User({ username });
+    // // Create a new user
+    // const { username, password } = req.body;
+    // const newUser = new User({ username });
+
+    // Create a new user with additional details
+    const { username, password, gender, fullName, birthDate } = req.body;
+    const newUser = new User({ username, gender, fullName, birthDate });
 
     // Register the new user with Passport
     await User.register(newUser, password);
@@ -151,7 +158,7 @@ const replySchema = new mongoose.Schema({
 const Discussion = mongoose.model('Discussion', discussionSchema);
 const Reply = mongoose.model('Reply', replySchema);
 
-mongoose.connect(atlasConnectionString, {
+mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -176,7 +183,7 @@ mongoose.connect(atlasConnectionString, {
     // app.get('/home', async (req, res) => {
     //   try {
     //     const discussions = await Discussion.find().populate('user replies');
-    
+
     //     res.render('home', { discussions, user: req.user });
     //   } catch (error) {
     //     console.error('Error fetching discussions:', error);
@@ -189,42 +196,42 @@ mongoose.connect(atlasConnectionString, {
         const discussions = await Discussion.find()
           .populate('user replies')
           .sort({ createdAt: -1 });
-    
+
         res.render('home', { discussions, user: req.user });
       } catch (error) {
         console.error('Error fetching discussions:', error);
         res.status(500).send('Error fetching discussions');
       }
     });
- // Fetch and render the most replied discussions (new route)
-app.get('/api/trending', async (req, res) => {
-  try {
-      const mostRepliedDiscussions = await Discussion.aggregate([
+    // Fetch and render the most replied discussions (new route)
+    app.get('/api/trending', async (req, res) => {
+      try {
+        const mostRepliedDiscussions = await Discussion.aggregate([
           {
-              $project: {
-                  _id: 1,
-                  content: 1,
-                  user: 1,
-                  likes: 1,
-                  dislikes: 1,
-                  createdAt: 1,
-                  repliesCount: { $size: "$replies" } // Calculate the number of replies
-              }
+            $project: {
+              _id: 1,
+              content: 1,
+              user: 1,
+              likes: 1,
+              dislikes: 1,
+              createdAt: 1,
+              repliesCount: { $size: "$replies" } // Calculate the number of replies
+            }
           },
           { $sort: { repliesCount: -1 } }, // Sort by the number of replies in descending order
           { $limit: 5 } // Limit to the top 5 most replied discussions
-      ]);
+        ]);
 
-      // Render a separate EJS template for the most replied discussions
-      res.json({ discussions: mostRepliedDiscussions });
-  } catch (error) {
-      // Handle errors
-      console.error('Error fetching most replied discussions:', error);
-      res.status(500).send('Internal Server Error');
-  }
-});
+        // Render a separate EJS template for the most replied discussions
+        res.json({ discussions: mostRepliedDiscussions });
+      } catch (error) {
+        // Handle errors
+        console.error('Error fetching most replied discussions:', error);
+        res.status(500).send('Internal Server Error');
+      }
+    });
 
- 
+
     app.get('/api/discussions', async (req, res) => {
       try {
         // Fetch all discussions, and populate user and replies
@@ -236,135 +243,135 @@ app.get('/api/trending', async (req, res) => {
               path: 'user',
             },
           });
-    
+
         res.json(discussions);
       } catch (error) {
         console.error('Error fetching discussions:', error);
         res.status(500).json({ message: 'Error fetching discussions' });
       }
     });
-    
+
     // Update the route to fetch a single discussion by ID
- 
+
     app.get('/discussion/:discussionId', async (req, res) => {
       try {
-          const discussionId = req.params.discussionId;
-  
-          // Find the discussion by ID, populate its user and replies
-          const discussion = await Discussion.findById(discussionId)
+        const discussionId = req.params.discussionId;
+
+        // Find the discussion by ID, populate its user and replies
+        const discussion = await Discussion.findById(discussionId)
           .populate('user')
-              .populate({
-                  path: 'replies',
-                  populate: {
-                      path: 'user',
-                  },
-              })
-  
-          if (!discussion) {
-              return res.status(404).json({ message: 'Discussion not found' });
-          }
-  
-          // Render the 'discussion.ejs' template with the discussion and its replies
-          res.render('discussion', { discussion, user: req.user });
+          .populate({
+            path: 'replies',
+            populate: {
+              path: 'user',
+            },
+          })
+
+        if (!discussion) {
+          return res.status(404).json({ message: 'Discussion not found' });
+        }
+
+        // Render the 'discussion.ejs' template with the discussion and its replies
+        res.render('discussion', { discussion, user: req.user });
       } catch (error) {
-          console.error('Error fetching discussion:', error);
-          res.status(500).json({ message: 'Error fetching discussion' });
+        console.error('Error fetching discussion:', error);
+        res.status(500).json({ message: 'Error fetching discussion' });
       }
-  });
-  
+    });
 
 
-  app.post('/discussion/:discussionId/replies', isLoggedIn, async (req, res) => {
-    try {
-      // Extract the discussion ID from the URL
-      const discussionId = req.params.discussionId;
-  
-      // Find the discussion by its ID
-      const discussion = await Discussion.findById(discussionId)
-      .populate('user')
-  
-      if (!discussion) {
-        return res.status(404).json({ message: 'Discussion not found' });
+
+    app.post('/discussion/:discussionId/replies', isLoggedIn, async (req, res) => {
+      try {
+        // Extract the discussion ID from the URL
+        const discussionId = req.params.discussionId;
+
+        // Find the discussion by its ID
+        const discussion = await Discussion.findById(discussionId)
+          .populate('user')
+
+        if (!discussion) {
+          return res.status(404).json({ message: 'Discussion not found' });
+        }
+
+        // Create a new reply using the data from the form submission
+        const newReply = new Reply({
+          content: req.body.content,
+          user: req.user._id,
+          discussion: discussion._id,
+        });
+
+        // Save the new reply to the database
+        await newReply.save();
+
+        // Update the discussion to include the new reply
+        discussion.replies.push(newReply._id);
+        await discussion.save();
+
+        // Update the user to include the new reply
+        req.user.replies.push(newReply._id);
+        await req.user.save();
+
+        // Send a response indicating success (you can customize this)
+        res.redirect(`/discussion/${discussionId}`);
+
+      } catch (error) {
+        console.error('Error creating reply:', error);
+        res.status(500).json({ message: 'Error creating reply' });
       }
-  
-      // Create a new reply using the data from the form submission
-      const newReply = new Reply({
-        content: req.body.content,
-        user: req.user._id,
-        discussion: discussion._id,
-      });
-  
-      // Save the new reply to the database
-      await newReply.save();
-  
-      // Update the discussion to include the new reply
-      discussion.replies.push(newReply._id);
-      await discussion.save();
-  
-      // Update the user to include the new reply
-      req.user.replies.push(newReply._id);
-      await req.user.save();
-  
-      // Send a response indicating success (you can customize this)
-      res.redirect(`/discussion/${discussionId}`);
+    });
 
-    } catch (error) {
-      console.error('Error creating reply:', error);
-      res.status(500).json({ message: 'Error creating reply' });
-    }
-  });
-  
 
 
 
     app.delete('/api/discussions/:discussionId', isLoggedIn, async (req, res) => {
       try {
         const discussion = await Discussion.findById(req.params.discussionId);
-    
+
         if (!discussion) {
           return res.status(404).json({ message: 'Discussion not found' });
         }
-    
+
         // Check if the current user is the author of the discussion
         if (discussion.user.toString() !== req.user._id.toString()) {
           return res.status(403).json({ message: 'You are not authorized to delete this discussion' });
         }
-    
+
         // Delete the discussion and associated replies
         await Discussion.findByIdAndDelete(req.params.discussionId);
         await Reply.deleteMany({ discussion: req.params.discussionId });
-    
+
         res.status(200).json({ message: 'Discussion deleted successfully' });
       } catch (error) {
         console.error('Error deleting discussion:', error);
         res.status(500).json({ message: 'Error deleting discussion' });
       }
     });
-//--------------
+    //--------------
     // Route to delete replies
     app.delete('/api/replies/:replyId', isLoggedIn, async (req, res) => {
       try {
-          const reply = await Reply.findById(req.params.replyId);
-  
-          if (!reply) {
-              return res.status(404).json({ message: 'Reply not found' });
-          }
-  
-          // Check if the current user is the author of the reply
-          if (reply.user.toString() !== req.user._id.toString()) {
-              return res.status(403).json({ message: 'You are not authorized to delete this reply' });
-          }
-  
-          // Delete the reply
-          await Reply.findByIdAndDelete(req.params.replyId);
-  
-          res.status(200).json({ message: 'Reply deleted successfully' });
+        const reply = await Reply.findById(req.params.replyId);
+
+        if (!reply) {
+          return res.status(404).json({ message: 'Reply not found' });
+        }
+
+        // Check if the current user is the author of the reply
+        if (reply.user.toString() !== req.user._id.toString()) {
+          return res.status(403).json({ message: 'You are not authorized to delete this reply' });
+        }
+
+        // Delete the reply
+        await Reply.findByIdAndDelete(req.params.replyId);
+
+        res.status(200).json({ message: 'Reply deleted successfully' });
       } catch (error) {
-          console.error('Error deleting reply:', error);
-          res.status(500).json({ message: 'Error deleting reply' });
+        console.error('Error deleting reply:', error);
+        res.status(500).json({ message: 'Error deleting reply' });
       }
-  });
-  
+    });
+
     //----------
     // Route for handling likes for discussion
     app.put('/api/likes/:discussionId', isLoggedIn, async (req, res) => {
@@ -513,36 +520,43 @@ app.get('/api/trending', async (req, res) => {
       }
     });
 
-// Render the search page
-app.get('/search', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'search.html')); // Serve the search.html file
-});
+    // Render the search page
+    app.get('/search', (req, res) => {
+      res.sendFile(path.join(__dirname, 'public', 'search.html')); // Serve the search.html file
+    });
 
 
-// Search discussions
-app.get('/search/discussions', async (req, res) => {
-  try {
-      const searchTerm = req.query.q;
-      const discussions = await Discussion.find({ content: { $regex: searchTerm, $options: 'i' } });
-      res.json({ discussions });
-  } catch (error) {
-      console.error('Error searching discussions:', error);
-      res.status(500).json({ message: 'Error searching discussions' });
-  }
-});
+    // Search discussions
+    app.get('/search/discussions', async (req, res) => {
+      try {
+        const searchTerm = req.query.q;
+        const discussions = await Discussion.find({ content: { $regex: searchTerm, $options: 'i' } });
+        res.json({ discussions });
+      } catch (error) {
+        console.error('Error searching discussions:', error);
+        res.status(500).json({ message: 'Error searching discussions' });
+      }
+    });
 
-// Search users
-app.get('/search/users', async (req, res) => {
-  try {
-      const searchTerm = req.query.q;
-      const users = await User.find({ username: { $regex: searchTerm.toString(), $options: 'i' } });
-      res.json({ users });
-  } catch (error) {
-      console.error('Error searching users:', error);
-      res.status(500).json({ message: 'Error searching users' });
-  }
-});
-
+    // Search users
+    app.get('/search/users', async (req, res) => {
+      try {
+        const searchTerm = req.query.q;
+        const users = await User.find({ username: { $regex: searchTerm.toString(), $options: 'i' } });
+        res.json({ users });
+      } catch (error) {
+        console.error('Error searching users:', error);
+        res.status(500).json({ message: 'Error searching users' });
+      }
+    });
+    // 404 not found
+    app.use((req, res, next) => {
+      res.status(404).render('404'); // Render your custom 404 page
+    });
+    // some error
+    app.use((req, res, next) => {
+      res.status(500).render('error'); // Render your custom 404 page
+    });
     // starting server
 
     app.listen(port, () => {
