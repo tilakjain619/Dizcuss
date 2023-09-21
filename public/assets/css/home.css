@@ -71,8 +71,17 @@
 .reply-card{
     margin-left: 20px;
 }
+.user-detail-name{
+    display: flex;
+    gap: 4px;
+}
+.user-full-name{
+    font-weight: bold;
+    font-family: 'poppins', sans-serif;
+    font-size: 15px;
+}
 .user-name{
-    font-family: poppins;
+    font-family: 'poppins', sans-serif;
     font-size: 13px;
     color: #959595;
 }
