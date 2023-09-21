@@ -84,6 +84,7 @@
     font-family: 'poppins', sans-serif;
     font-size: 13px;
     color: #959595;
+    align-self: center;
 }
 .discussion-toolbar{
     display: flex;

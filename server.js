@@ -42,7 +42,8 @@ const userSchema = new mongoose.Schema({
   dislikedReplies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }],
   discussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
   replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }],
-  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] // Store user IDs that this user is following
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Store user IDs that this user is following
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model('User', userSchema);
@@ -131,7 +132,8 @@ app.post('/update-profile', isLoggedIn, async (req, res) => {
     res.redirect('/profile');
   } catch (error) {
     console.error('Error updating profile:', error);
-    res.status(500).json({ message: 'Error updating profile' });
+    // res.status(500).json({ message: 'Error updating profile' });
+    res.render('error', { message: 'Something went wrong! Maybe you left some inputs empty 🤔' });
   }
 });
 // Define Mongoose schema and models
@@ -512,8 +514,18 @@ mongoose.connect(atlasConnectionString, {
           .populate('replies')
           .exec();
 
-        // Render the 'user.ejs' template with the user and discussions data
-        res.render('user', { user, discussions });
+        // Fetch replies made by the user
+        const userReplies = await Reply.find({ user: user._id })
+          .populate('discussion')
+          .exec();
+
+        console.log('User Replies:', userReplies); // Add this line
+
+        // Render the 'user.ejs' template with the user, discussions, and userReplies data
+        res.render('user', { user, discussions, userReplies });
+
+        // Render the 'user.ejs' template with the user, discussions, and userReplies data
+        // res.render('user', { user, discussions, userReplies });
       } catch (error) {
         // Handle any errors that occur during data fetching
         console.error('Error fetching user data:', error);
@@ -521,11 +533,14 @@ mongoose.connect(atlasConnectionString, {
       }
     });
 
+
     // Render the search page
     app.get('/search', (req, res) => {
-      res.sendFile(path.join(__dirname, 'public', 'search.html')); // Serve the search.html file
+      res.render('search');
     });
-
+    app.get('/discussion', (req, res) => {
+      res.redirect(`/home`);
+    })
 
     // Search discussions
     app.get('/search/discussions', async (req, res) => {
@@ -550,112 +565,113 @@ mongoose.connect(atlasConnectionString, {
         res.status(500).json({ message: 'Error searching users' });
       }
     });
-// Route to follow another user
-app.post('/follow/:userId', isLoggedIn, async (req, res) => {
-  try {
-    const userToFollow = await User.findById(req.params.userId);
-    if (!userToFollow) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    // Route to follow another user
+    app.post('/follow/:userId', isLoggedIn, async (req, res) => {
+      try {
+        const userToFollow = await User.findById(req.params.userId);
 
-    // Check if the user is already following the target user
-    if (!req.user.following.includes(userToFollow._id)) {
-      req.user.following.push(userToFollow._id); // Add the user to the "following" list
-      await req.user.save();
-    }
+        if (!userToFollow) {
+          return res.status(404).json({ message: 'User not found' });
+        }
 
-    res.json({ isFollowing: true }); // Indicate that the user is now following
-  } catch (error) {
-    console.error('Error following user:', error);
-    res.status(500).json({ message: 'Error following user', error: error.message });
-  }
-});
+        // Check if the user is already following the target user
+        if (!req.user.following.includes(userToFollow._id)) {
+          req.user.following.push(userToFollow._id); // Add the user to the "following" list
+          await req.user.save();
+        }
 
-
-// Route to unfollow another user
-app.post('/unfollow/:userId', isLoggedIn, async (req, res) => {
-  try {
-    const userToUnfollow = await User.findById(req.params.userId);
-    if (!userToUnfollow) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const index = req.user.following.indexOf(userToUnfollow._id);
-    if (index !== -1) {
-      req.user.following.splice(index, 1);
-      await req.user.save();
-      console.log('Successfully unfollowed user:', userToUnfollow.username);
-      res.json({ isFollowing: false });
-    } else {
-      console.log('User was not following:', userToUnfollow.username);
-      res.json({ isFollowing: false }); // User was not following, so no changes
-    }
-  } catch (error) {
-    console.error('Error unfollowing user:', error);
-    res.status(500).json({ message: 'Error unfollowing user' });
-  }
-});
+        res.json({ isFollowing: true }); // Indicate that the user is now following
+      } catch (error) {
+        console.error('Error following user:', error);
+        res.status(500).json({ message: 'Error following user', error: error.message });
+      }
+    });
 
 
-// Route to check follow status (GET request)
-app.get('/follow/status/:userId', isLoggedIn, async (req, res) => {
-  try {
-    const userToCheck = await User.findById(req.params.userId);
-    if (!userToCheck) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    // Route to unfollow another user
+    app.post('/unfollow/:userId', isLoggedIn, async (req, res) => {
+      try {
+        const userToUnfollow = await User.findById(req.params.userId);
+        if (!userToUnfollow) {
+          return res.status(404).json({ message: 'User not found' });
+        }
 
-    // Check if the user is following the target user
-    const isFollowing = req.user.following.includes(userToCheck._id);
+        const index = req.user.following.indexOf(userToUnfollow._id);
+        if (index !== -1) {
+          req.user.following.splice(index, 1);
+          await req.user.save();
+          console.log('Successfully unfollowed user:', userToUnfollow.username);
+          res.json({ isFollowing: false });
+        } else {
+          console.log('User was not following:', userToUnfollow.username);
+          res.json({ isFollowing: false }); // User was not following, so no changes
+        }
+      } catch (error) {
+        console.error('Error unfollowing user:', error);
+        res.status(500).json({ message: 'Error unfollowing user' });
+      }
+    });
 
-    res.json({ isFollowing });
-  } catch (error) {
-    console.error('Error checking follow status:', error);
-    res.status(500).json({ message: 'Error checking follow status' });
-  }
-});
-// Example Express.js route to toggle follow/unfollow
-app.post('/toggleFollow/:userId', isLoggedIn, async (req, res) => {
-  try {
-    const userToToggle = await User.findById(req.params.userId);
-    if (!userToToggle) {
-      return res.status(404).json({ message: 'User not found' });
-    }
 
-    // Check if the user is following the target user
-    const index = req.user.following.indexOf(userToToggle._id);
-    if (index !== -1) {
-      // User is following, unfollow them
-      req.user.following.splice(index, 1); // Remove the user from the "following" list
-    } else {
-      // User is not following, follow them
-      req.user.following.push(userToToggle._id); // Add the user to the "following" list
-    }
+    // Route to check follow status (GET request)
+    app.get('/follow/status/:userId', isLoggedIn, async (req, res) => {
+      try {
+        const userToCheck = await User.findById(req.params.userId);
+        if (!userToCheck) {
+          return res.status(404).json({ message: 'User not found' });
+        }
 
-    await req.user.save();
+        // Check if the user is following the target user
+        const isFollowing = req.user.following.includes(userToCheck._id);
 
-    res.json({ isFollowing: req.user.following.includes(userToToggle._id) });
-  } catch (error) {
-    console.error('Error toggling follow status:', error);
-    res.status(500).json({ message: 'Error toggling follow status' });
-  }
-});
+        res.json({ isFollowing });
+      } catch (error) {
+        console.error('Error checking follow status:', error);
+        res.status(500).json({ message: 'Error checking follow status' });
+      }
+    });
+    // Example Express.js route to toggle follow/unfollow
+    app.post('/toggleFollow/:userId', isLoggedIn, async (req, res) => {
+      try {
+        const userToToggle = await User.findById(req.params.userId);
+        if (!userToToggle) {
+          return res.status(404).json({ message: 'User not found' });
+        }
 
-// Route to fetch discussions from followed users
-app.get('/feed', isLoggedIn, async (req, res) => {
-  try {
-    // Retrieve discussions from users in the "following" list
-    const discussions = await Discussion.find({ user: { $in: req.user.following } })
-      .populate('user replies')
-      .sort({ createdAt: -1 });
+        // Check if the user is following the target user
+        const index = req.user.following.indexOf(userToToggle._id);
+        if (index !== -1) {
+          // User is following, unfollow them
+          req.user.following.splice(index, 1); // Remove the user from the "following" list
+        } else {
+          // User is not following, follow them
+          req.user.following.push(userToToggle._id); // Add the user to the "following" list
+        }
 
-    res.render('feed', { discussions, user: req.user });
-    // res.json({discussions, user: req.user})
-  } catch (error) {
-    console.error('Error fetching feed:', error);
-    res.status(500).send('Error fetching feed');
-  }
-});
+        await req.user.save();
+
+        res.json({ isFollowing: req.user.following.includes(userToToggle._id) });
+      } catch (error) {
+        console.error('Error toggling follow status:', error);
+        res.status(500).json({ message: 'Error toggling follow status' });
+      }
+    });
+
+    // Route to fetch discussions from followed users
+    app.get('/feed', isLoggedIn, async (req, res) => {
+      try {
+        // Retrieve discussions from users in the "following" list
+        const discussions = await Discussion.find({ user: { $in: req.user.following } })
+          .populate('user replies')
+          .sort({ createdAt: -1 });
+
+        res.render('feed', { discussions, user: req.user });
+        // res.json({discussions, user: req.user})
+      } catch (error) {
+        console.error('Error fetching feed:', error);
+        res.status(500).send('Error fetching feed');
+      }
+    });
     // 404 not found
     app.use((req, res, next) => {
       res.status(404).render('404'); // Render your custom 404 page

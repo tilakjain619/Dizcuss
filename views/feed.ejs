@@ -1,36 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/feed.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/photos/brand/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/photos/brand/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
+    <link rel="stylesheet" href="../assets/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feed | Dizcuss</title>
 </head>
+
 <body>
-    <%- include('sidebar', { currentPage: 'Feed' }) %>
+    <%- include('sidebar', { currentPage: 'Feed'}) %>
+    <iframe src="../trending.html" class="most-trending-discussion-container" frameborder="0"></iframe>
+        <div class="home-container">
+            <section id="create-discussion">
+                <form id="discussion-form">
 
-    <section class="home-container">
-        <h1>Feed</h1>
+                    <label for="content">Add Discussion</label>
+                    <textarea id="content" class="content-input" name="content" rows="4" cols="50"
+                        placeholder="Ask a question?" required></textarea><br>
 
-        <!-- Loop through discussions and display them -->
-        <ul class="discussion-list">
-            <% discussions.forEach(discussion => { %>
-                <li class="discussion">
-                    <div class="discussion-header">
-                        <span><%= discussion.user.username %></span>
+                    <button type="submit" class="submit-button">Post</button>
+                </form>
+            </section>
+            <% 
+            function formatTimestamp(createdAt) {
+                const now = new Date();
+                const diffInMilliseconds = now - createdAt;
+              
+                if (diffInMilliseconds < 60000) {
+                  return `${Math.floor(diffInMilliseconds / 1000)} seconds ago`;
+                } else if (diffInMilliseconds < 3600000) {
+                  return `${Math.floor(diffInMilliseconds / 60000)} minutes ago`;
+                } else if (diffInMilliseconds < 86400000) {
+                  return `${Math.floor(diffInMilliseconds / 3600000)} hours ago`;
+                } else {
+                  return `${Math.floor(diffInMilliseconds / 86400000)} days ago`;
+                }
+              }
+  %>            
+            <div id="discussions" class="discussion-container">
+                <% discussions.forEach(discussion=> { %>
+                    <%
+                    const createdAt = new Date(discussion.createdAt);
+            const formattedTimestamp = formatTimestamp(createdAt); 
+            // Get the count of replies for this discussion
+            const replyCount = discussion.replies.length;
+            %>
+                    <div class="discussion-card">
+                        <a href="/member/<%= discussion.user.username %>" class="user-detail-name">
+                            <p class="user-full-name"><%= discussion.user.fullName %></p>
+                        <p class="user-name">
+                            @<%= discussion.user.username %>
+                        </p>
+                    </a>
+                        <a href="/discussion/<%= discussion._id %>">
+                        <p class="discussion-title" data-id="<%= discussion._id %>">
+                            <%= discussion.content %>
+                        </p>
+                    </a>
+                        <p class="discussion-time"><%= formattedTimestamp %></p>
+                        <div class="discussion-toolbar">
+                        <a class="reply-button discussion-btn" href="/discussion/<%= discussion._id %>"><%= replyCount %> Replies</a>
+                            <button class="like-discussion-button discussion-btn" data-id="<%= discussion._id %>">
+                                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                <span class="count">
+                                    <%= discussion.likes %>
+                                </span>
+                            </button>
+                            <button class="dislike-discussion-button discussion-btn" data-id="<%= discussion._id %>">
+                                <i class="fa fa-thumbs-down" aria-hidden="true"></i>
+                                <%= discussion.dislikes %>
+                            </button>
+                            <!-- <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button> -->
+                            <% if (user && user._id.toString() === discussion.user._id.toString()) { %>
+                                <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button>
+                            <% } %>
+                        </div>
                     </div>
-                    <div class="discussion-content">
-                        <p><%= discussion.content %></p>
-                        <!-- You can include additional discussion content like images or videos here -->
-                    </div>
-                    <div class="discussion-actions">
-                        <button class="like-button">Like</button>
-                        <button class="comment-button">Comment</button>
-                    </div>
-                </li>
-            <% }); %>
-        </ul>
-    </section>
+                    <!-- hidden: replies on feed -->
+                    <!-- <div class="reply-card">
+                        <% discussion.replies.forEach(reply=> { %>
+                            <div>
+                                <p>
+                                    <%= reply.user.username %>
+                                </p>
+                                <p>
+                                    <%= reply.content %>
+                                </p>
+                                <button class="like-button discussion-btn" data-id="<%= reply._id %>">Like (<%= reply.likes %>
+                                        )</button>
+                                <button class="dislike-button discussion-btn" data-id="<%= reply._id %>">Dislike (<%= reply.dislikes %>
+                                        )</button>
+                            </div>
+                            <% }); %>
+                    </div> -->
+                    <% }); %>
+            </div>
+        </div>
+        
+        <div id="popup" class="popup" style="display: none;">
+            <div class="popup-content">
+                <span class="close-popup"><i class="fa fa-times" aria-hidden="true"></i>
+                </span>
+                <h2>Discussion</h2>
+                <div id="discussion-popup" class="discussion-card">
+                    <!-- Discussion content goes here -->
+                </div>
+                <h2>Replies</h2>
+                <div id="replies-popup" class="reply-card">
+                    <!-- Replies content goes here -->
+                </div>
+                <!-- Add other content here -->
+            </div>
+        </div>
+        <script type="text/javascript" src="../assets/js/app.js"></script>
 </body>
+
 </html>
