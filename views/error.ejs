@@ -1,12 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Error</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/photos/brand/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/photos/brand/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
+    <title>Try Again</title>
+    <style>
+        .error-container {
+            padding: 2rem;
+            display: grid;
+            height: 100vh;
+            align-content: center;
+            gap: 1rem;
+        }
+
+        .error-title {
+            font-size: 1rem;
+        }
+
+        .error-custom-message {
+            font-size: 2rem;
+        }
+
+        .error-container a:hover {
+            text-decoration: underline;
+        }
+        @media (min-width: 1200px){
+            .error-custom-message{
+                font-size: 3rem;
+            }
+        }
+    </style>
 </head>
+
 <body>
-    <h1>500 Error</h1>
-    <p><%= message %></p>
-    <h4>Your</h4>
+    <div class="error-container">
+        <h1 class="error-title">Error 500</h1>
+        <p class="error-custom-message">
+            <%= message %>
+        </p>
+        <a href="javascript: history.go (-1)">Click here to go back</a>
+    </div>
 </body>
+
 </html>

@@ -18,18 +18,18 @@
   <%- include('sidebar', { currentPage: 'User Profile' }) %>
 
     <div class="home-container">
-      <h2>Welcome, <span class="greet-username"><%= user.username %></span>!</h2>
+      <h2>Welcome, <span class="greet-username"><%= user.fullName %></span>!</h2>
     <div class="login-container">
       <div class="form-container">
         <p class="title">Profile</p>
       <form action="/update-profile" onsubmit="showToast('Profile edited!')" class="form" method="POST">
         <div class="input-group">
           <label for="username">Username:</label>
-        <input type="text" id="username" name="username" value="<%= user.username %>" disabled>
+        <input type="text" id="username" name="username" value="<%= user.username %>" disabled required>
         </div>
         <div class="input-group">
           <label for="password">Password:</label>
-        <input type="password" id="password" name="password" value="<%= user.password %>" disabled>
+        <input type="password" id="password" name="password" value="<%= user.password %>" disabled required>
         </div><br>
         <div class="profile-btn">
           <button type="button" class="sign" id="editProfileButton">Edit Profile</button>

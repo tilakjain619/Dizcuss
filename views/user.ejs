@@ -10,17 +10,39 @@
 <link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/user.css">
-    <title>User Profile</title>
+    <link rel="stylesheet" href="../assets/css/home.css">
+    <link rel="stylesheet" href="../assets/css/discussion.css">
+    <title>@<%= user.username %> | Dizcuss</title>
 </head>
 
 <body>
+    <% 
+            function formatTimestamp(createdAt) {
+                const now = new Date();
+                const diffInMilliseconds = now - createdAt;
+              
+                if (diffInMilliseconds < 60000) {
+                  return `${Math.floor(diffInMilliseconds / 1000)} seconds ago`;
+                } else if (diffInMilliseconds < 3600000) {
+                  return `${Math.floor(diffInMilliseconds / 60000)} minutes ago`;
+                } else if (diffInMilliseconds < 86400000) {
+                  return `${Math.floor(diffInMilliseconds / 3600000)} hours ago`;
+                } else {
+                  return `${Math.floor(diffInMilliseconds / 86400000)} days ago`;
+                }
+              }
+  %>        
     <%- include('sidebar', { currentPage: 'Profile' }) %>
     <section class="home-container">
         <p class="username-title">
             <%= user.username %>
         </p>
         <!-- HTML button element -->
-        <button id="followButton" data-user-id="<%= user._id %>">Follow</button>
+        
+        <% if (user._id !== user.userId) { %>
+            <button id="followButton" data-user-id="<%= user._id %>">Follow</button> 
+        <% } %>
+        <p>Followers: <%= user.followers.length  %></p>
 
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'User-Discussion')">Discussions</button>
@@ -30,26 +52,55 @@
         <div id="User-Discussion" class="tabcontent">
             <ul>
                 <% discussions.forEach(discussion=> { %>
-                <li>
-                    <%= discussion.content %>
-                </li>
-                <% }); %>
+                    <%
+                    const createdAt = new Date(discussion.createdAt);
+            const formattedTimestamp = formatTimestamp(createdAt); 
+            // Get the count of replies for this discussion
+            const replyCount = discussion.replies.length;
+            %>
+                    <div class="discussion-card">
+                        <a href="/member/<%= user.username %>" class="user-detail-name">
+                            <p class="user-full-name"><%= user.fullName %></p>
+                        <p class="user-name">
+                            @<%= user.username %>
+                        </p>
+                    </a>
+                        <a href="/discussion/<%= discussion._id %>">
+                        <p class="discussion-title" data-id="<%= discussion._id %>">
+                            <%= discussion.content %>
+                        </p>
+                    </a>
+                        <p class="discussion-time"><%= formattedTimestamp %></p>
+                        <div class="discussion-toolbar">
+                        <a class="reply-button discussion-btn" href="/discussion/<%= discussion._id %>"><%= replyCount %> Replies</a>
+                        </div>
+                        </div>
+                        <% }); %>
             </ul>
         </div>
 
         <div id="User-Replies" class="tabcontent">
-            <% discussions.forEach(discussion=> { %>
-            <h3>
-                <%= discussion.content %>
-            </h3>
-            <ul>
-                <% discussion.replies.forEach(reply=> { %>
-                <li>
-                    <%= reply.content %>
-                </li>
-                <% }); %>
-            </ul>
-            <% }); %>
+                            </a><% userReplies.forEach(reply => { %>
+                                <% const createdAt=new Date(reply.createdAt); const
+                                formattedTimestampReply=formatTimestamp(createdAt); %>
+                                <li class="reply-component">
+                                    <a href="/member/<%= user.username %>">
+                                        <p class="reply-username">
+                                            @<%= user.username %>
+                                        </p>
+                                    </a>
+                                    <p class="reply-time">
+                                        <%= formattedTimestampReply %>
+                                    </p>
+                                    <a href="/discussion/">
+                                        <p class="reply-content">
+                                            <%= reply.content %>
+                                        </p>
+                                    </a>
+                                            <!-- You can display more details about each reply as needed -->
+                                </li>
+                            <% }); %>
+                                    <!-- You can display more details about each reply as needed -->
         </div>
     </section>
     <!-- Display other user profile information and discussions as needed -->
