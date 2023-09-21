@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/feed.css">
+    <title>Feed | Dizcuss</title>
+</head>
+<body>
+    <%- include('sidebar', { currentPage: 'Feed' }) %>
+
+    <section class="home-container">
+        <h1>Feed</h1>
+
+        <!-- Loop through discussions and display them -->
+        <ul class="discussion-list">
+            <% discussions.forEach(discussion => { %>
+                <li class="discussion">
+                    <div class="discussion-header">
+                        <span><%= discussion.user.username %></span>
+                    </div>
+                    <div class="discussion-content">
+                        <p><%= discussion.content %></p>
+                        <!-- You can include additional discussion content like images or videos here -->
+                    </div>
+                    <div class="discussion-actions">
+                        <button class="like-button">Like</button>
+                        <button class="comment-button">Comment</button>
+                    </div>
+                </li>
+            <% }); %>
+        </ul>
+    </section>
+</body>
+</html>

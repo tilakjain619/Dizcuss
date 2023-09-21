@@ -446,4 +446,3 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 // fetchDiscussions();
-
