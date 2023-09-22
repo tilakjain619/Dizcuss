@@ -10,10 +10,10 @@ const passportLocalMongoose = require('passport-local-mongoose');
 require('dotenv').config();
 
 // atlas connection
-const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
+// const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
 // local connection
-// const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
+const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -136,6 +136,28 @@ app.post('/update-profile', isLoggedIn, async (req, res) => {
     res.render('error', { message: 'Something went wrong! Maybe you left some inputs empty 🤔' });
   }
 });
+// Create a new route for account deletion
+app.post('/delete-account', isLoggedIn, async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    // Delete all discussions created by the user
+    await Discussion.deleteMany({ user: userId });
+
+    // Delete all replies created by the user
+    await Reply.deleteMany({ user: userId });
+
+    // Delete the user's account
+    await User.findByIdAndDelete(userId);
+
+    // Redirect to the login page or any other appropriate page
+    res.redirect('/login');
+  } catch (error) {
+    console.error('Error deleting account:', error);
+    res.status(500).json({ message: 'Error deleting account' });
+  }
+});
+
 // Define Mongoose schema and models
 const discussionSchema = new mongoose.Schema({
   content: String,
@@ -161,7 +183,7 @@ const replySchema = new mongoose.Schema({
 const Discussion = mongoose.model('Discussion', discussionSchema);
 const Reply = mongoose.model('Reply', replySchema);
 
-mongoose.connect(atlasConnectionString, {
+mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
