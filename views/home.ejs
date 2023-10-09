@@ -73,10 +73,6 @@
                                     <%= discussion.likes %>
                                 </span>
                             </button>
-                            <button class="dislike-discussion-button discussion-btn" data-id="<%= discussion._id %>">
-                                <i class="fa fa-thumbs-down" aria-hidden="true"></i>
-                                <%= discussion.dislikes %>
-                            </button>
                             <!-- <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button> -->
                             <% if (user && user._id.toString() === discussion.user._id.toString()) { %>
                                 <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button>

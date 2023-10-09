@@ -34,14 +34,16 @@
   %>        
     <%- include('sidebar', { currentPage: 'Profile' }) %>
     <section class="home-container">
-        <p class="username-title">
-            <%= user.username %>
-        </p>
-        <!-- HTML button element -->
-        
-        <% if (user._id !== user.userId) { %>
-            <button id="followButton" data-user-id="<%= user._id %>">Follow</button> 
-        <% } %>
+        <div class="user-info-section">
+            <p class="username-title">
+                <%= user.username %>
+            </p>
+            <!-- HTML button element -->
+            
+            <% if (user._id !== user.userId) { %>
+                <button id="followButton" data-user-id="<%= user._id %>" class="follow-button">Follow</button> 
+            <% } %>
+        </div>
         <p>Followers: <%= user.followers.length  %></p>
 
         <div class="tab">
@@ -125,7 +127,7 @@
                 if (response.ok) {
                     // Toggle Follow/Unfollow
                     const data = await response.json();
-                    followButton.textContent = data.isFollowing ? 'Unfollow' : 'Follow';
+                    followButton.textContent = data.isFollowing ? 'Following' : 'Follow';
                 } else {
                     console.error('Toggle Follow/Unfollow request failed');
                 }
@@ -151,7 +153,7 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    followButton.textContent = data.isFollowing ? 'Unfollow' : 'Follow';
+                    followButton.textContent = data.isFollowing ? 'Following' : 'Follow';
                 } else {
                     console.error('Failed to fetch follow status');
                 }

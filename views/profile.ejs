@@ -102,6 +102,7 @@
                 window.location.href = '/login';
               } else {
                 console.error('Account deletion request failed');
+                showToast("Account deletion failed")
               }
             })
             .catch((error) => {

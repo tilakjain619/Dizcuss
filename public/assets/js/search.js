@@ -41,11 +41,14 @@ document.addEventListener("DOMContentLoaded", () => {
             // Populate user results
             if (userData.users.length > 0) {
                 userData.users.forEach((user) => {
-                    const userItem = document.createElement("li");
-                    const userLink = document.createElement("a");
-                    userLink.href = `/member/${user.username}`;
+                    const userItem = document.createElement("a");
+                    const userNameSearch = document.createElement("li");
+                    userNameSearch.textContent = user.fullName;
+                    const userLink = document.createElement("p");
+                    userItem.href = `/member/${user.username}`;
                     userLink.textContent = user.username;
-                    userItem.appendChild(userLink);
+                    userNameSearch.appendChild(userLink);
+                    userItem.appendChild(userNameSearch);
                     userResults.appendChild(userItem);
                 });
             } else {

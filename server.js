@@ -4,16 +4,17 @@ const path = require('path');
 const passport = require('passport');
 const session = require('express-session');
 const LocalStrategy = require('passport-local').Strategy;
+
 // const User = require('../models/user');
 const passportLocalMongoose = require('passport-local-mongoose');
 
 require('dotenv').config();
 
 // atlas connection
-// const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
+const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
 // local connection
-const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
+// const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -37,9 +38,7 @@ const userSchema = new mongoose.Schema({
   fullName: String,
   birthDate: Date,
   likedDiscussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
-  dislikedDiscussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
   likedReplies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }],
-  dislikedReplies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }],
   discussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
   replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Store user IDs that this user is following
@@ -88,7 +87,7 @@ app.post('/signup', async (req, res) => {
     // Register the new user with Passport
     await User.register(newUser, password);
 
-    res.redirect('/login'); // Redirect to login page after successful signup
+    res.redirect('/login?message=Successfully signed up! Now, login'); // Redirect to login page after successful signup
   } catch (error) {
     res.render('signup'); // Render signup page again in case of error
   }
@@ -103,7 +102,7 @@ app.get('/login', (req, res) => {
 
 app.post('/login', passport.authenticate('local', {
   successRedirect: '/home',
-  failureRedirect: '/login'
+  failureRedirect: '/login?message=Incorrect Information'
 }));
 
 app.get('/logout', (req, res) => {
@@ -151,7 +150,7 @@ app.post('/delete-account', isLoggedIn, async (req, res) => {
     await User.findByIdAndDelete(userId);
 
     // Redirect to the login page or any other appropriate page
-    res.redirect('/login');
+    res.redirect('/login?message=Account Deleted Successfully');
   } catch (error) {
     console.error('Error deleting account:', error);
     res.status(500).json({ message: 'Error deleting account' });
@@ -163,7 +162,6 @@ const discussionSchema = new mongoose.Schema({
   content: String,
   createdAt: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 },
-  dislikes: { type: Number, default: 0 },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }]
 });
@@ -172,7 +170,6 @@ const replySchema = new mongoose.Schema({
   content: String,
   createdAt: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 },
-  dislikes: { type: Number, default: 0 },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   discussion: {
     type: mongoose.Schema.Types.ObjectId,
@@ -183,7 +180,7 @@ const replySchema = new mongoose.Schema({
 const Discussion = mongoose.model('Discussion', discussionSchema);
 const Reply = mongoose.model('Reply', replySchema);
 
-mongoose.connect(mongoURI, {
+mongoose.connect(atlasConnectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -238,7 +235,6 @@ mongoose.connect(mongoURI, {
               content: 1,
               user: 1,
               likes: 1,
-              dislikes: 1,
               createdAt: 1,
               repliesCount: { $size: "$replies" } // Calculate the number of replies
             }
@@ -264,17 +260,19 @@ mongoose.connect(mongoURI, {
           .populate('user')
           .populate({
             path: 'replies',
+            options: { sort: { createdAt: -1 } }, // Sort replies by createdAt in descending order
             populate: {
               path: 'user',
             },
           });
-
+    
         res.json(discussions);
       } catch (error) {
         console.error('Error fetching discussions:', error);
         res.status(500).json({ message: 'Error fetching discussions' });
       }
     });
+    
 
     // Update the route to fetch a single discussion by ID
 
@@ -324,6 +322,7 @@ mongoose.connect(mongoURI, {
           content: req.body.content,
           user: req.user._id,
           discussion: discussion._id,
+          createdAt: new Date()
         });
 
         // Save the new reply to the database
@@ -430,38 +429,6 @@ mongoose.connect(mongoURI, {
       }
     });
 
-    // Route for handling dislikes for discussion
-    app.put('/api/dislikes/:discussionId', isLoggedIn, async (req, res) => {
-      try {
-        const discussion = await Discussion.findById(req.params.discussionId);
-
-        if (!discussion) {
-          return res.status(404).json({ message: 'Discussion not found' });
-        }
-
-        const user = req.user;
-
-        // Check if the user has already disliked this discussion
-        if (user.dislikedDiscussions.includes(discussion._id)) {
-          // If yes, remove the dislike
-          user.dislikedDiscussions.pull(discussion._id);
-          discussion.dislikes--;
-        } else {
-          // If no, add the dislike
-          user.dislikedDiscussions.push(discussion._id);
-          discussion.dislikes++;
-        }
-
-        // Save the changes
-        await user.save();
-        await discussion.save();
-
-        res.json(discussion);
-      } catch (error) {
-        res.status(500).json({ message: 'Error updating dislikes' });
-      }
-    });
-
 
 
     // Route for handling likes for replies
@@ -496,28 +463,6 @@ mongoose.connect(mongoURI, {
       }
     });
 
-    // Similar route for disliking replies
-
-    // Route for handling dislikes for replies
-    app.put('/api/dislikes/:replyId', isLoggedIn, async (req, res) => {
-      try {
-        const reply = await Reply.findById(req.params.replyId);
-
-        if (!reply) {
-          return res.status(404).json({ message: 'Reply not found' });
-        }
-
-        const updatedReply = await Reply.findByIdAndUpdate(
-          req.params.replyId,
-          { $inc: { dislikes: 1 } }, // Increment the dislikes count by 1
-          { new: true } // Return the updated reply
-        );
-
-        res.json(updatedReply);
-      } catch (error) {
-        res.status(500).json({ message: 'Error updating dislikes' });
-      }
-    });
     // Define a route to get a user's profile by username
     app.get('/member/:username', async (req, res) => {
       try {

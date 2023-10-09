@@ -146,4 +146,9 @@
   #passwordInfo #strong {
     color: rgb(6, 201, 6);
   }
-  
+  #login-message{
+    text-align: center;
+    padding: 14px;
+    font-size: 15px;
+    color: #b3b3b3;
+  }

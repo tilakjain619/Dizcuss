@@ -13,11 +13,11 @@
       font-family: "Poppins", sans-serif;
     }
 
-    .container {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+    .container-404 {
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    height: 100dvh;
     }
 
     .gif {
@@ -26,17 +26,27 @@
     }
 
     .content {
-      text-align: center;
-      margin: 3rem 0;
+      padding: 20px;
+    text-align: center;
+    position: fixed;
+    /* top: 50%; */
+    /* left: 0; */
+    width: min(600px, 90%);
+    background: #00000021;
+    border-radius: 1rem;
+    /* right: 0; */
+    backdrop-filter: blur(4px);
+    /* margin-left: auto; */
+    margin: 10px;
     }
 
     .content .main-heading {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       font-weight: 700;
     }
 
     p {
-      font-size: 1.3rem;
+      font-size: 1rem;
       padding: 0.7rem 0;
     }
 
@@ -57,10 +67,53 @@
 </head>
 
 <body>
-  <div class="container">
-    <div class="gif">
+  <div class="container-404">
+    <!-- <div class="gif">
       <img src="https://i.postimg.cc/2yrFyxKv/giphy.gif" alt="gif_ing" />
-    </div>
+    </div> -->
+    <css-doodle>
+      <style>
+        @grid: 50x1 / 50vmin;
+        :container {
+          perspective: 23vmin;
+        }
+        background: @m(
+          @r(200, 240), 
+          radial-gradient(
+            @p(#00b8a9, #f8f3d4, #f6416c, #ffde7d) 15%,
+            transparent 50%
+          ) @r(100%) @r(100%) / @r(1%, 3%) @lr no-repeat
+        );
+    
+        @size: 80%;
+        @place-cell: center;
+    
+        border-radius: 50%;
+        transform-style: preserve-3d;
+        animation: scale-up 20s linear infinite;
+        animation-delay: calc(@i * -.4s);
+    
+        @keyframes scale-up {
+          0% {
+            opacity: 0;
+            transform: translate3d(0, 0, 0) rotate(0);
+          }
+          10% { 
+            opacity: 1; 
+          }
+          95% {
+            transform:
+              translate3d(0, 0, @r(50vmin, 55vmin))
+              rotate(@r(-360deg, 360deg));
+          }
+          100% {
+            opacity: 0;
+            transform: translate3d(0, 0, 1vmin);
+          }
+        }
+      </style>
+    </css-doodle>
+    
     <div class="content">
       <h1 class="main-heading">This page is gone.</h1>
       <p>
@@ -71,6 +124,7 @@
       </a>
     </div>
   </div>
+  <script src="https://unpkg.com/css-doodle@0.17.2/css-doodle.min.js"></script>
 </body>
 
 </html>
