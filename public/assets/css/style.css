@@ -356,7 +356,7 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-flow: wrap;
+    flex-wrap: wrap;
 }
 
 figure.snip1157 {
@@ -370,7 +370,6 @@ figure.snip1157 {
     text-align: left;
     box-shadow: none !important;
 }
-
 figure.snip1157 * {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
@@ -594,3 +593,4 @@ figure.snip1157 .author h5 {
     font-family: "Poppins", sans-serif;
     margin: auto;
 }
+

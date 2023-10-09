@@ -105,3 +105,26 @@
 	position:relative;
 	top:1px;
 }
+.user-detail-name{
+    display: flex;
+    gap: 4px;
+}
+.user-full-name{
+    font-weight: bold;
+    font-family: 'poppins', sans-serif;
+    font-size: 15px;
+}
+.user-name{
+    font-family: 'poppins', sans-serif;
+    font-size: 13px;
+    color: #959595;
+    align-self: center;
+}
+.delete-reply-button{
+    font-size: 13px;
+    padding: 3px 0;
+    outline: none;
+    background: transparent;
+    color: red;
+    border: 1px solid transparent;
+}

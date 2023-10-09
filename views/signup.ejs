@@ -11,10 +11,10 @@
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="../assets/css/sidebar.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
   <title>Signup on Dizcuss</title>
 </head>
 
@@ -24,81 +24,191 @@
   <body>
     <header>
       <div class="toggle">
-          <i class="fas fa-bars"></i>
+        <i class="fas fa-bars"></i>
       </div>
       <h3>
-          Signup
+        Signup
       </h3>
       <a href="/login">
         <i class="fas fa-sign-in-alt"></i>
       </a>
-  </header>
-  <nav>
+    </header>
+    <nav>
       <ul>
-          <li class="d-logo">
-              <img src="../assets/photos/brand/favicon-32x32.png" alt="our logo">
-          </li>
-          <li>
-              <a class="toggle">
-                  <span class="icon"><i class="fas fa-bars"></i></span>
-                  <span class="title">Menu</span>
-              </a>
-          </li>
-          <li>
-              <a href="/home">
-                  <span class="icon"><i class="fas fa-home"></i></span>
-                  <span class="title">Home</span>
-              </a>
-          </li>
-          <li>
-              <a href="/login">
-                  <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
-                  <span class="title">Log In</span>
-              </a>
-          </li>
+        <li class="d-logo">
+          <img src="../assets/photos/brand/favicon-32x32.png" alt="our logo">
+        </li>
+        <li>
+          <a class="toggle">
+            <span class="icon"><i class="fas fa-bars"></i></span>
+            <span class="title">Menu</span>
+          </a>
+        </li>
+        <li>
+          <a href="/home">
+            <span class="icon"><i class="fas fa-home"></i></span>
+            <span class="title">Home</span>
+          </a>
+        </li>
+        <li>
+          <a href="/login">
+            <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+            <span class="title">Log In</span>
+          </a>
+        </li>
       </ul>
-  </nav>
-      <div class="login-container">
-        <div class="form-container">
-          <p class="title">Signup</p>
-          <form class="form" id="form" action="/signup" method="POST">
+    </nav>
+    <div class="login-container">
+      <div class="form-container">
+        <p class="title">Signup</p>
+        <form class="form" id="form" action="/signup" method="POST">
+          <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" name="username" placeholder="Username" id="username" required>
+          </div>
+          <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" placeholder="Password" id="password" required>
+            <div id="passwordStrength">
+              <span id="poor"></span>
+              <span id="weak"></span>
+              <span id="strong"></span>
+            </div>
+            <div id="passwordInfo" style="margin-bottom: 17px;"></div>
+          </div>
+          <div class="input-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" name="fullName" placeholder="Full Name" id="fullName" required>
+          </div>
+          <div class="input-grid">
             <div class="input-group">
-              <label for="username">Username</label>
-              <input type="text" name="username" placeholder="Username" id="username" required>
+              <label for="gender">Gender</label>
+              <!-- <input type="text" name="gender" placeholder="gender" id="gender" required> -->
+              <select name="gender" id="gender" class="gender-select" required>
+                <option disabled hidden selected>Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
             </div>
             <div class="input-group">
-              <label for="password">Password</label>
-              <input type="password" name="password" placeholder="Password" id="password" required>
+              <label for="birthDate">Birth Date</label>
+              <input type="date" name="birthDate" placeholder="Birth Date" id="BirthDate" required>
             </div>
-            <div class="input-group">
-              <label for="fullName">Full Name</label>
-              <input type="text" name="fullName" placeholder="Full Name" id="fullName" required>
-            </div>
-            <div class="input-grid">
-              <div class="input-group">
-                <label for="gender">Gender</label>
-                <!-- <input type="text" name="gender" placeholder="gender" id="gender" required> -->
-                <select name="gender" id="gender" class="gender-select" required>
-                  <option disabled hidden selected>Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-              </div>
-              <div class="input-group">
-                <label for="birthDate">Birth Date</label>
-                <input type="date" name="birthDate" placeholder="Birth Date" id="BirthDate" required>
-              </div>
-            </div>
-            <br>
-            <button class="sign">Signup</button>
-          </form>
+          </div>
           <br>
-          <p class="signup">Already have an account?
-            <a rel="noopener noreferrer" href="/login" class="">Login</a>
-          </p>
-        </div>
+          <button class="sign">Signup</button>
+        </form>
+        <br>
+        <p class="signup">Already have an account?
+          <a rel="noopener noreferrer" href="/login" class="">Login</a>
+        </p>
       </div>
-      <script src="../assets/js/script.js"></script>
+    </div>
+    <script>
+        // Password strength indicator for signup
+        let passwordInput = document.querySelector(
+          '#password'
+        );
+        let passwordStrength = document.getElementById("passwordStrength");
+        let poor = document.querySelector("#passwordStrength #poor");
+        let weak = document.querySelector("#passwordStrength #weak");
+        let strong = document.querySelector("#passwordStrength #strong");
+        let passwordInfo = document.getElementById("passwordInfo");
+
+        let poorRegExp = /[a-z]/;
+        let weakRegExp = /(?=.*?[0-9])/;
+        let strongRegExp = /(?=.*?[#?!@$%^&*-])/;
+        let whitespaceRegExp = /^$|\s+/;
+
+        passwordInput.addEventListener('input', () => {
+          let passwordValue = passwordInput.value;
+          let passwordLength = passwordValue.length;
+
+          let poorPassword = passwordValue.match(poorRegExp);
+          let weakPassword = passwordValue.match(weakRegExp);
+          let strongPassword = passwordValue.match(strongRegExp);
+          let whitespace = passwordValue.match(whitespaceRegExp);
+
+          if (passwordValue != "") {
+            passwordStrength.style.display = "block";
+            passwordStrength.style.display = "flex";
+            passwordInfo.style.display = "block";
+
+            if (whitespace) {
+              passwordInfo.textContent = "Whitespaces are not allowed";
+            } else {
+              poorPasswordStrength(
+                passwordLength,
+                poorPassword,
+                weakPassword,
+                strongPassword
+              );
+              weakPasswordStrength(
+                passwordLength,
+                poorPassword,
+                weakPassword,
+                strongPassword
+              );
+              strongPasswordStrength(
+                passwordLength,
+                poorPassword,
+                weakPassword,
+                strongPassword
+              );
+            }
+          } else {
+            passwordStrength.style.display = "none";
+            passwordInfo.style.display = "none";
+          }
+        });
+
+        function poorPasswordStrength(
+          passwordLength,
+          poorPassword,
+          weakPassword,
+          strongPassword
+        ) {
+          if (passwordLength <= 3 && (poorPassword || weakPassword || strongPassword)) {
+            poor.classList.add("active");
+            passwordInfo.style.display = "block";
+            passwordInfo.style.color = "rgb(255, 46, 46)";
+            passwordInfo.textContent = "Your password is poor";
+          }
+        }
+
+        function weakPasswordStrength(
+          passwordLength,
+          poorPassword,
+          weakPassword,
+          strongPassword
+        ) {
+          if (passwordLength >= 4 && poorPassword && (weakPassword || strongPassword)) {
+            weak.classList.add("active");
+            passwordInfo.textContent = "Your password is Weak";
+            passwordInfo.style.color = "orange";
+          } else {
+            weak.classList.remove("active");
+          }
+        }
+
+        function strongPasswordStrength(
+          passwordLength,
+          poorPassword,
+          weakPassword,
+          strongPassword
+        ) {
+          if (passwordLength >= 6 && poorPassword && weakPassword && strongPassword) {
+            poor.classList.add("active");
+            weak.classList.add("active");
+            strong.classList.add("active");
+            passwordInfo.textContent = "Your password is strong";
+            passwordInfo.style.color = "rgb(6, 201, 6)";
+          } else {
+            strong.classList.remove("active");
+          }
+        }
+    </script>
+    <script src="../assets/js/script.js" type="text/javascript"></script>
   </body>
 
 </html>

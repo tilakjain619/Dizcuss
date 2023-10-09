@@ -87,10 +87,6 @@ async function fetchDiscussions(user) {
                                 ${discussion.likes}
                             </span>
                         </button>
-                        <button class="dislike-discussion-button discussion-btn" data-id="${discussion._id}">
-                        <i class="fa fa-thumbs-down" aria-hidden="true"></i>
-                        ${discussion.dislikes}
-                    </button>
                     ${deleteButtonHTML}
                     </div>
             </div>
@@ -125,10 +121,9 @@ async function fetchDiscussions(user) {
 
 async function handleLikeDislike(event, isLike, isActive) {
     const id = event.target.getAttribute('data-id');
-    const endpoint = isLike ? 'likes' : 'dislikes';
   
     try {
-      const response = await fetch(`/api/${endpoint}/${id}`, {
+      const response = await fetch(`/api/likes/${id}`, {
         method: 'PUT'
       });
   
@@ -153,9 +148,6 @@ async function handleLikeDislike(event, isLike, isActive) {
     if (event.target.classList.contains('like-button')) {
         console.log('Like button clicked');
       handleLikeDislike(event, true);
-    } else if (event.target.classList.contains('dislike-button')) {
-        console.log('Dislike button clicked');
-      handleLikeDislike(event, false);
     }
   });
   
@@ -194,8 +186,6 @@ async function handleLikeDislike(event, isLike, isActive) {
 discussionsContainer.addEventListener('click', event => {
     if (event.target.classList.contains('like-discussion-button')) {
         handleLikeDislike(event, true);
-    } else if (event.target.classList.contains('dislike-discussion-button')) {
-        handleLikeDislike(event, false);
     }
     else if (event.target.classList.contains('delete-discussion-button')) {
         const discussionId = event.target.getAttribute('data-id');
@@ -238,49 +228,6 @@ discussionsContainer.addEventListener('click', event => {
 // });
 
 
-// ...
-
-const popup = document.getElementById('popup');
-const discussionPopup = document.getElementById('discussion-popup');
-const repliesPopup = document.getElementById('replies-popup');
-const discussionTitle = document.getElementById('discussion-title');
-
-// Add a click event listener to discussions
-async function showPopup(event) {
-    if (event.target.classList.contains('discussion')) {
-        const discussionId = event.target.dataset.id;
-        const response = await fetch(`/api/discussions/${discussionId}`);
-        const data = await response.json();
-
-        // Populate the popup with discussion content
-        discussionPopup.innerHTML = `
-            <p><strong>@${data.user.username}</strong></p>
-            <p>${data.content}</p>
-        `;
-
-        // Populate the popup with replies content
-        repliesPopup.innerHTML = '';
-        data.replies.forEach((reply) => {
-            repliesPopup.innerHTML += `
-                <div>
-                    <p><strong>@${reply.user.username}</strong></p>
-                    <p>${reply.content}</p>
-                </div>
-            `;
-        });
-
-        // Display the popup
-        popup.style.display = 'grid';
-    }
-};
-
-// Close the popup when the close button is clicked
-popup.querySelector('.close-popup').addEventListener('click', () => {
-    popup.style.display = 'none';
-});
-
-// ...
-
 // Open popup when "Reply" button is clicked
 discussionsContainer.addEventListener('click', event => {
     if (event.target.classList.contains('reply-button')) {
@@ -288,8 +235,6 @@ discussionsContainer.addEventListener('click', event => {
         // Handle opening the reply popup here if needed
     } else if (event.target.classList.contains('like-button')) {
         handleLikeDislike(event, true);
-    } else if (event.target.classList.contains('dislike-button')) {
-        handleLikeDislike(event, false);
     }
 });
 

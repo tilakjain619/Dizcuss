@@ -64,13 +64,26 @@
         </div><br>
         <button class="sign">Sign in</button>
       </form>
+      <div id="login-message"></div>
       <br>
       <p class="signup">Don't have an account?
         <a rel="noopener noreferrer" href="/signup" class="">Sign up</a>
       </p>
     </div>
   </div>
-  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+            if (message) {
+                // Display the message in a visible element (e.g., a div)
+                const messageElement = document.getElementById('login-message');
+                if (messageElement) {
+                    messageElement.innerText = message;
+                }
+            }
+        });
+  </script>
 <script src="../assets/js/script.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 </body>

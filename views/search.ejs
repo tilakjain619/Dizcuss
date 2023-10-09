@@ -12,14 +12,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search on Dizcuss</title>
     <style>
-        /* this is a recreation of twitter search in css */
+        .search-results{
+
+        }
 .form {
   --input-text-color: #fff;
   --input-bg-color: var(--dark);
   --focus-input-bg-color: transparent;
   --text-color: #afafaf;
   --active-color: var(--yellow);
-  --width-of-input: 300px;
+  --width-of-input: 100%;
   --inline-padding-of-input: 1.2em;
   --gap: 0.9rem;
 }
@@ -49,7 +51,7 @@
 label {
   width: 100%;
   padding: 0.8em;
-  height: 40px;
+  height: 50px;
   padding-inline: var(--inline-padding-of-input);
   display: flex;
   align-items: center;
@@ -128,6 +130,46 @@ input:-webkit-autofill:active {
         --width-of-input: 100%;
     }
 }
+details {
+  width: 50%;
+  margin: 0 auto;
+  background: #282828;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 0.1rem 1rem -0.5rem rgba(0, 0, 0, 0.4);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+summary {
+  padding: 1rem;
+  display: block;
+  background: #333;
+  padding-left: 2.2rem;
+  position: relative;
+  cursor: pointer;
+}
+
+summary:before {
+  content: "";
+  border-width: 0.4rem;
+  border-style: solid;
+  border-color: transparent transparent transparent #fff;
+  position: absolute;
+  top: 1.3rem;
+  left: 1rem;
+  transform: rotate(0);
+  transform-origin: 0.2rem 50%;
+  transition: 0.25s transform ease;
+}
+
+/* THE MAGIC 🧙‍♀️ */
+details[open] > summary:before {
+  transform: rotate(90deg);
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
     </style>
 </head>
 <body>
@@ -136,7 +178,7 @@ input:-webkit-autofill:active {
     <main class="home-container">
         <div>
             <form class="form">
-                <label for="search">
+                <label for="searchInput">
                     <input class="input" type="text" required="" placeholder="Search Dizcuss" id="searchInput">
                     <div class="fancy-bg"></div>
                     <div class="search">
@@ -155,15 +197,17 @@ input:-webkit-autofill:active {
             </form>
         </div>
     
-        <h2>Discussions:</h2>
-        <ul id="discussionResults">
+        <div class="search-results">
+          <summary>Discussions:</summary>
+          <details id="discussionResults">
             <!-- Discussion results will be displayed here -->
-        </ul>
+          </details>
     
-        <h2>Users:</h2>
-        <ul id="userResults">
+        <details id="userResults">
+          <summary>Users</summary>
             <!-- User results will be displayed here -->
-        </ul>
+        </details>
+        </div>
     </main>
 
     <script src="../assets/js/search.js"></script>
