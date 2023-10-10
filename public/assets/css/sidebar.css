@@ -5,7 +5,7 @@ nav {
     background: var(--bg-secondary);
     transition: .5s;
     overflow: hidden;
-    z-index: 2;
+    z-index: 12;
     border-right: 1px solid #ffffff64;
 }
 
