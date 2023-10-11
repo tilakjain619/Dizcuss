@@ -11,10 +11,10 @@ const passportLocalMongoose = require('passport-local-mongoose');
 require('dotenv').config();
 
 // atlas connection
-// const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
+const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
 // local connection
-const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
+// const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -194,7 +194,7 @@ const replySchema = new mongoose.Schema({
 const Discussion = mongoose.model('Discussion', discussionSchema);
 const Reply = mongoose.model('Reply', replySchema);
 
-mongoose.connect(mongoURI, {
+mongoose.connect(atlasConnectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -546,53 +546,62 @@ mongoose.connect(mongoURI, {
         res.status(500).json({ message: 'Error searching users' });
       }
     });
-    // Route to follow another user
-    app.post('/follow/:userId', isLoggedIn, async (req, res) => {
-      try {
-        const userToFollow = await User.findById(req.params.userId);
 
-        if (!userToFollow) {
-          return res.status(404).json({ message: 'User not found' });
-        }
+// Route to follow another user
+app.post('/follow/:userId', isLoggedIn, async (req, res) => {
+  try {
+    const userToFollow = await User.findById(req.params.userId);
 
-        // Check if the user is already following the target user
-        if (!req.user.following.includes(userToFollow._id)) {
-          req.user.following.push(userToFollow._id); // Add the user to the "following" list
-          await req.user.save();
-        }
+    if (!userToFollow) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-        res.json({ isFollowing: true }); // Indicate that the user is now following
-      } catch (error) {
-        console.error('Error following user:', error);
-        res.status(500).json({ message: 'Error following user', error: error.message });
+    // Check if the user is already following the target user
+    if (!req.user.following.includes(userToFollow._id)) {
+      req.user.following.push(userToFollow._id); // Add the user to the "following" list
+      await req.user.save();
+
+      userToFollow.followers.push(req.user._id); // Add the follower to the "followers" list of the user being followed
+      await userToFollow.save();
+    }
+
+    res.json({ isFollowing: true }); // Indicate that the user is now following
+  } catch (error) {
+    console.error('Error following user:', error);
+    res.status(500).json({ message: 'Error following user', error: error.message });
+  }
+});
+
+// Route to unfollow another user
+app.post('/unfollow/:userId', isLoggedIn, async (req, res) => {
+  try {
+    const userToUnfollow = await User.findById(req.params.userId);
+    if (!userToUnfollow) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const index = req.user.following.indexOf(userToUnfollow._id);
+    if (index !== -1) {
+      req.user.following.splice(index, 1);
+      await req.user.save();
+
+      const followerIndex = userToUnfollow.followers.indexOf(req.user._id);
+      if (followerIndex !== -1) {
+        userToUnfollow.followers.splice(followerIndex, 1);
+        await userToUnfollow.save();
       }
-    });
 
-
-    // Route to unfollow another user
-    app.post('/unfollow/:userId', isLoggedIn, async (req, res) => {
-      try {
-        const userToUnfollow = await User.findById(req.params.userId);
-        if (!userToUnfollow) {
-          return res.status(404).json({ message: 'User not found' });
-        }
-
-        const index = req.user.following.indexOf(userToUnfollow._id);
-        if (index !== -1) {
-          req.user.following.splice(index, 1);
-          await req.user.save();
-          console.log('Successfully unfollowed user:', userToUnfollow.username);
-          res.json({ isFollowing: false });
-        } else {
-          console.log('User was not following:', userToUnfollow.username);
-          res.json({ isFollowing: false }); // User was not following, so no changes
-        }
-      } catch (error) {
-        console.error('Error unfollowing user:', error);
-        res.status(500).json({ message: 'Error unfollowing user' });
-      }
-    });
-
+      // console.log('Successfully unfollowed user:', userToUnfollow.username);
+      res.json({ isFollowing: false });
+    } else {
+      // console.log('User was not following:', userToUnfollow.username);
+      res.json({ isFollowing: false }); // User was not following, so no changes
+    }
+  } catch (error) {
+    console.error('Error unfollowing user:', error);
+    res.status(500).json({ message: 'Error unfollowing user' });
+  }
+});
 
     // Route to check follow status (GET request)
     app.get('/follow/status/:userId', isLoggedIn, async (req, res) => {
@@ -637,7 +646,8 @@ mongoose.connect(mongoURI, {
         res.status(500).json({ message: 'Error toggling follow status' });
       }
     });
-
+    
+    
     // Route to fetch discussions from followed users
     app.get('/feed', isLoggedIn, async (req, res) => {
       try {

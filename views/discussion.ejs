@@ -72,27 +72,29 @@
                                     <p class="reply-content">
                                         <%= reply.content %>
                                     </p>
-                                    <div class="dropdown">
-                                        <a data-toggle="dropdown" class="dropbtn"><i class="fa fa-ellipsis-h"
-                                                aria-hidden="true"></i></a>
-                                        <!-- <span class="glyphicon glyphicon-option-vertical"> </span>-->
-                                        <ul class="dropdown-content">
-                                            <% if (user && user._id.toString()===reply.user._id.toString()) { %>
-                                                <li>
-                                                    <a href="#" class="delete-reply-button discussion-btn"
-                                                        data-id="<%= reply._id %>">Delete</a>
-                                                </li>
-                                                <% } %>
+                                    <div class="flex-menu">
+                                        <% if (reply.reported) { %>
+                                            <p class="reported-status"><i class="fa fa-flag" aria-hidden="true"></i>
+                                                Reported</p>
+                                            <% } %>
+                                        <div class="dropdown">
+                                            <a data-toggle="dropdown" class="dropbtn"><i class="fa fa-ellipsis-h"
+                                                    aria-hidden="true"></i></a>
+                                            <!-- <span class="glyphicon glyphicon-option-vertical"> </span>-->
+                                            <ul class="dropdown-content">
+                                                <% if (user && user._id.toString()===reply.user._id.toString()) { %>
                                                     <li>
-                                                        <a href="#" class="report-button"
-                                                            onclick="reportContent('reply', '<%= reply._id %>')">Report</a>
+                                                        <a href="#" class="delete-reply-button discussion-btn"
+                                                            data-id="<%= reply._id %>">Delete</a>
                                                     </li>
-                                        </ul>
+                                                    <% } %>
+                                                        <li>
+                                                            <a href="#" class="report-button"
+                                                                onclick="reportContent('reply', '<%= reply._id %>')">Report</a>
+                                                        </li>
+                                            </ul>
+                                        </div>
                                     </div>
-                                    <% if (reply.reported) { %>
-                                        <p class="reported-status"><i class="fa fa-flag" aria-hidden="true"></i>
-                                            Reported</p>
-                                        <% } %>
                                 </li>
                                 <% }); %>
                     </ul>
