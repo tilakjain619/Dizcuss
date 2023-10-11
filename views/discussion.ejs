@@ -12,12 +12,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        @<%= discussion.user.username %> | Dizcuss
+        <%= discussion.user.fullName %> | Dizcuss
     </title>
 </head>
 <%- include('sidebar', { currentPage: 'Discussion' }) %>
 
     <body>
+        <iframe src="../trending.html" class="most-trending-discussion-container" frameborder="0"></iframe>
         <div class="home-container">
 
             <% function formatTimestamp(createdAt) { const now=new Date(); const diffInMilliseconds=now - createdAt; if
@@ -58,22 +59,40 @@
                                 formattedTimestampReply=formatTimestamp(createdAt); %>
                                 <li class="reply-component">
                                     <a href="/member/<%= reply.user.username %>" class="user-detail-name">
-                                        <p class="user-full-name"><%= reply.user.fullName %></p>
-                                    <p class="user-name">
-                                        @<%= reply.user.username %>
-                                    </p>
-                                </a>
+                                        <p class="user-full-name">
+                                            <%= reply.user.fullName %>
+                                        </p>
+                                        <p class="user-name">
+                                            @<%= reply.user.username %>
+                                        </p>
+                                    </a>
                                     <p class="reply-time">
                                         <%= formattedTimestampReply %>
                                     </p>
                                     <p class="reply-content">
                                         <%= reply.content %>
                                     </p>
-                                    <% if (user && user._id.toString()===reply.user._id.toString()) { %>
-                                        <button class="delete-reply-button discussion-btn"
-                                            data-id="<%= reply._id %>">Delete</button>
+                                    <div class="dropdown">
+                                        <a data-toggle="dropdown" class="dropbtn"><i class="fa fa-ellipsis-h"
+                                                aria-hidden="true"></i></a>
+                                        <!-- <span class="glyphicon glyphicon-option-vertical"> </span>-->
+                                        <ul class="dropdown-content">
+                                            <% if (user && user._id.toString()===reply.user._id.toString()) { %>
+                                                <li>
+                                                    <a href="#" class="delete-reply-button discussion-btn"
+                                                        data-id="<%= reply._id %>">Delete</a>
+                                                </li>
+                                                <% } %>
+                                                    <li>
+                                                        <a href="#" class="report-button"
+                                                            onclick="reportContent('reply', '<%= reply._id %>')">Report</a>
+                                                    </li>
+                                        </ul>
+                                    </div>
+                                    <% if (reply.reported) { %>
+                                        <p class="reported-status"><i class="fa fa-flag" aria-hidden="true"></i>
+                                            Reported</p>
                                         <% } %>
-                                            <!-- You can display more details about each reply as needed -->
                                 </li>
                                 <% }); %>
                     </ul>
@@ -90,6 +109,27 @@
                     }
                 });
             });
+            // dropdown for options on replies 
+            const dropdownMenus = document.querySelectorAll('.dropbtn');
+const dropdowns = document.querySelectorAll('.dropdown-content');
+
+// Add a click event listener to each dropdown button
+dropdownMenus.forEach((dropdownMenu, index) => {
+  dropdownMenu.addEventListener('click', () => {
+    // Toggle the display of the corresponding dropdown
+    dropdowns[index].style.display = (dropdowns[index].style.display === 'block') ? 'none' : 'block';
+  });
+});
+
+// Add a click event listener to the document to close the dropdowns when clicking outside
+document.addEventListener('click', function (event) {
+  dropdowns.forEach((dropdown, index) => {
+    if (!dropdown.contains(event.target) && !dropdownMenus[index].contains(event.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+});
+
         </script>
         <script src="../assets/js/app.js"></script>
     </body>

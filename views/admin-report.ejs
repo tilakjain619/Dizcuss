@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin-report.css">
+    <title>Admin</title>
+</head>
+<body>
+  <%- include('sidebar', { currentPage: 'Admin'}) %>
+  <div class="points-for-admin">
+    <h2>Remember</h2>
+    <li>Only approve content that follows the rules.</li>
+<li>Check users to prevent spam.</li>
+<li>Keep discussions on-topic.</li>
+<li>Encourage positive contributions.</li>
+<li>Respect free speech with boundaries.</li>
+<li>Explain why content is approved.</li>
+  </div>
+    <div class="home-container">
+        <h1 class="admin-report-page-title">Admin Reports</h1>
+
+  <!-- Display reported discussions -->
+  <h2 class="admin-report-section-title">Reported Discussions</h2>
+  <div style="overflow-x:auto;">
+  <table id="myTable">
+    <tr class="header">
+      <th style="width:20%;">User</th>
+      <th style="width:40%;">Content</th>
+      <th style="width: 30%;">Reason</th>
+      <th style="width: 10%;">Options</th>
+    </tr>
+    <% reportedDiscussions.forEach(discussion => { %>
+      <tr>
+        <td><%= discussion.user.username %></td>
+        <td><%= discussion.content %></td>
+        <td><%= discussion.reportReason %></td>
+        <td><a href="/admin/approve-report/discussion/<%= discussion._id %>">Approve</a>
+          <a href="/admin/delete-report/discussion/<%= discussion._id %>">Delete</a></td>
+      </tr>
+    <% }) %>
+  </table>
+</div>
+  <h2 class="admin-report-section-title">Reported Replies</h2>
+  <!-- Display reported replies -->
+  <div style="overflow-x:auto;">
+  <table id="myTable">
+    <tr class="header">
+      <th style="width:20%;">User</th>
+      <th style="width:40%;">Content</th>
+      <th style="width: 30%;">Reason</th>
+      <th style="width: 10%;">Options</th>
+    </tr>
+    <% reportedReplies.forEach(reply => { %>
+      <tr>
+        <td><%= reply.user.username %></td>
+        <td><%= reply.content %></td>
+        <td><%= reply.reportReason %></td>
+        <td><a href="/admin/approve-report/reply/<%= reply._id %>">Approve</a>
+          <a href="/admin/delete-report/reply/<%= reply._id %>">Delete</a></td>
+      </tr>
+    <% }) %>
+  </table>
+  </div>
+    </div>
+</body>
+</html>

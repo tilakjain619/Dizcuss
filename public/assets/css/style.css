@@ -588,9 +588,55 @@ figure.snip1157 .author h5 {
     }
 }
 .home-container{
-    width: min(800px, 90%);
+    width: min(800px, 85%);
     padding: 20px;
     font-family: "Poppins", sans-serif;
     margin: auto;
 }
-
+/* trending discussions container frame */
+.most-trending-discussion-container{
+    width: 18%;
+    top: 2.5rem;
+    position: fixed;
+    right: 2rem;
+    height: 100%;
+    /* z-index: -1; */
+}
+@media (max-width: 1320px){
+    .most-trending-discussion-container{
+        display: none;
+    }
+}
+.dropdown {
+    position: relative;
+  }
+  .dropbtn{
+    cursor: pointer;
+    transition: .2s;
+  }
+  .dropbtn:hover{
+    opacity: .8;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    min-width: 100px;
+    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+    z-index: 1;
+  }
+  
+  .dropdown-content a {
+    color: black;
+    padding: 12px 10px;
+    text-decoration: none;
+    display: block;
+    font-size: 13px;
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #e4e4e4;
+    border-radius: 6px;
+    }

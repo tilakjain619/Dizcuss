@@ -27,14 +27,17 @@ document.addEventListener("DOMContentLoaded", () => {
             // Populate discussion results
             if (discussionData.discussions.length > 0) {
                 discussionData.discussions.forEach((discussion) => {
-                    const discussionItem = document.createElement("li");
-                    const discussionLink = document.createElement("a");
-                    discussionLink.href = `/discussion/${discussion._id}`;
-                    discussionLink.textContent = discussion.content;
-                    discussionItem.appendChild(discussionLink);
-                    discussionResults.appendChild(discussionItem);
+                    const discussionItemHTML = `<li>
+                        <a href="/discussion/${discussion._id}">${discussion.content}</a>
+                    </li>`;
+            
+                    const discussionItem = document.createElement("div");
+                    discussionItem.innerHTML = discussionItemHTML;
+                    
+                    discussionResults.appendChild(discussionItem.firstChild);
                 });
-            } else {
+            }
+             else {
                 discussionResults.textContent = "No discussions found.";
             }
 
@@ -43,10 +46,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 userData.users.forEach((user) => {
                     const userItem = document.createElement("a");
                     const userNameSearch = document.createElement("li");
+                    userNameSearch.classList.add("search-fullname");
                     userNameSearch.textContent = user.fullName;
                     const userLink = document.createElement("p");
                     userItem.href = `/member/${user.username}`;
-                    userLink.textContent = user.username;
+                    userLink.textContent = `@${user.username}`;
+                    userLink.classList.add("search-username");
                     userNameSearch.appendChild(userLink);
                     userItem.appendChild(userNameSearch);
                     userResults.appendChild(userItem);
@@ -72,3 +77,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+let tabs = document.querySelector(".tabs");
+let tabHeader = tabs.querySelector(".tab-header");
+let tabHeaderElements = tabs.querySelectorAll(".tab-header > div");
+let tabBody = tabs.querySelector(".tab-body");
+let tabBodyElements = tabs.querySelectorAll(".tab-body > div");
+let tabIndicator = tabs.querySelector(".tab-indicator > div");
+
+for (let i = 0; i < tabHeaderElements.length; i++) {
+    tabHeaderElements[i].addEventListener("click", function () {
+        tabHeader.querySelector(".active").classList.remove("active");
+        tabHeaderElements[i].classList.add("active");
+        tabBody.querySelector(".active").classList.remove("active");
+        tabBodyElements[i].classList.add("active");
+        tabIndicator.style.left = `${i * 25}%`;
+    });
+}
