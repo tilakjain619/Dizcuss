@@ -42,7 +42,8 @@ const userSchema = new mongoose.Schema({
   discussions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Discussion' }],
   replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // Store user IDs that this user is following
-  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  isAdmin: { type: Boolean, default: false }
 });
 userSchema.plugin(passportLocalMongoose);
 const User = mongoose.model('User', userSchema);
@@ -51,6 +52,13 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+
+const isAdmin = (req, res, next) => {
+  if (req.isAuthenticated() && req.user.isAdmin) {
+    return next();
+  }
+  res.status(403).json({ message: 'Permission denied' });
+};
 // Define authentication middleware
 const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -163,7 +171,10 @@ const discussionSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   likes: { type: Number, default: 0 },
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }]
+  replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Reply' }],
+  reported: { type: Boolean, default: false },
+  reportReason: String,
+  reportedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 const replySchema = new mongoose.Schema({
@@ -175,6 +186,9 @@ const replySchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Discussion',
   },
+  reported: { type: Boolean, default: false },
+  reportReason: String,
+  reportedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
 const Discussion = mongoose.model('Discussion', discussionSchema);
@@ -265,14 +279,14 @@ mongoose.connect(mongoURI, {
               path: 'user',
             },
           });
-    
+
         res.json(discussions);
       } catch (error) {
         console.error('Error fetching discussions:', error);
         res.status(500).json({ message: 'Error fetching discussions' });
       }
     });
-    
+
 
     // Update the route to fetch a single discussion by ID
 
@@ -639,6 +653,138 @@ mongoose.connect(mongoURI, {
         res.status(500).send('Error fetching feed');
       }
     });
+
+    app.get('/admin/reported-content', isAdmin, async (req, res) => {
+      try {
+        // Fetch reported content from the database
+        const reportedDiscussions = await Discussion.find({ reported: true }).populate('user');
+        const reportedReplies = await Reply.find({ reported: true }).populate('user');
+
+        res.render('admin-report', { reportedDiscussions, reportedReplies });
+      } catch (error) {
+        console.error('Error fetching reported content:', error);
+        res.status(500).json({ message: 'Error fetching reported content' });
+      }
+    });
+    app.post('/api/report', isLoggedIn, async (req, res) => {
+      try {
+        const { id, type, reason } = req.body;
+
+        // Check if the type is 'discussion' or 'reply' and validate input
+
+        // Find the content by ID and update its report status and reasons
+        const content = type === 'discussion'
+          ? await Discussion.findById(id)
+          : await Reply.findById(id);
+
+        if (!content) {
+          return res.status(404).json({ message: 'Content not found' });
+        }
+
+        content.reported = true;
+        content.reportReason = reason;
+        content.reportedBy.push(req.user._id);
+
+        await content.save();
+
+        res.status(201).json({ message: 'Content reported successfully' });
+      } catch (error) {
+        console.error('Error reporting content:', error);
+        res.status(500).json({ message: 'Error reporting content' });
+      }
+    });
+  // Admin approves reported content
+app.get('/admin/approve-report/:type/:id', isAdmin, async (req, res) => {
+  try {
+    const { type, id } = req.params;
+
+    if (type !== 'discussion' && type !== 'reply') {
+      return res.status(400).json({ message: 'Invalid content type' });
+    }
+
+    // Find the content by ID and update its report status and reasons
+    const content = type === 'discussion'
+      ? await Discussion.findById(id)
+      : await Reply.findById(id);
+
+    if (!content) {
+      return res.status(404).json({ message: 'Content not found' });
+    }
+
+    // Ensure that only admins can approve
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    // Perform the approval logic
+    content.reported = false;
+    content.reportReason = '';
+    await content.save();
+
+    res.status(200).json({ message: 'Content approved successfully' });
+  } catch (error) {
+    console.error('Error approving content:', error);
+    res.status(500).json({ message: 'Error approving content' });
+  }
+});
+
+// Admin deletes reported content
+app.get('/admin/delete-report/:type/:id', isAdmin, async (req, res) => {
+  try {
+    const { type, id } = req.params;
+
+    if (type !== 'discussion' && type !== 'reply') {
+      return res.status(400).json({ message: 'Invalid content type' });
+    }
+
+    // Find the content by ID and ensure it exists
+    const content = type === 'discussion'
+      ? await Discussion.findById(id)
+      : await Reply.findById(id);
+
+    if (!content) {
+      return res.status(404).json({ message: 'Content not found' });
+    }
+
+    // Ensure that only admins can delete
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    // Perform the deletion logic
+    if (type === 'discussion') {
+      // If it's a discussion, delete the discussion and associated replies
+      await Discussion.findByIdAndDelete(id);
+      await Reply.deleteMany({ discussion: id });
+    } else {
+      // If it's a reply, just delete the reply
+      // await content.remove(); // or use another appropriate method to delete
+      await Reply.findByIdAndDelete(id);
+    }
+
+    res.status(200).json({ message: 'Content deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting content:', error);
+    res.status(500).json({ message: 'Error deleting content' });
+  }
+});
+
+
+    app.post('/report', async (req, res) => {
+      try {
+        const { contentId, contentType, reason } = req.body;
+        const reporterId = req.user._id; // Assuming you have authentication in place
+
+        const report = await reportContent(contentId, contentType, reporterId, reason);
+
+        res.status(201).json({ message: 'Content reported successfully', report });
+      } catch (error) {
+        res.status(500).json({ message: 'Error reporting content', error: error.message });
+      }
+    });
+
+
+    // always keep below code at end to prevent any 404 error
     // 404 not found
     app.use((req, res, next) => {
       res.status(404).render('404'); // Render your custom 404 page

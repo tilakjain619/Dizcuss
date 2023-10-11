@@ -391,3 +391,28 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 // fetchDiscussions();
+function reportContent(type, id) {
+    const reason = prompt('Please provide a reason for reporting this content:');
+    
+    if (reason) {
+      fetch('/api/report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id, type, reason }),
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Content reported successfully. Thank you for your report.');
+        } else {
+          throw new Error('An error occurred while reporting the content.');
+        }
+      })
+      .catch(error => {
+        alert(error.message || 'An error occurred while reporting the content. Please try again later.');
+        console.error(error);
+      });
+    }
+  }
+  

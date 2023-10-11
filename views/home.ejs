@@ -73,12 +73,17 @@
                                     <%= discussion.likes %>
                                 </span>
                             </button>
+                            <% if (discussion.reported) { %>
+                                <p class="reported-status"><i class="fa fa-flag" aria-hidden="true"></i> Reported</p>
+                              <% } %>
                             <!-- <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button> -->
                             <% if (user && user._id.toString() === discussion.user._id.toString()) { %>
                                 <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button>
                             <% } %>
+                            <a href="#" class="report-button" onclick="reportContent('discussion', '<%= discussion._id %>')">Report</a>
                         </div>
                     </div>
+
                     <!-- hidden: replies on feed -->
                     <!-- <div class="reply-card">
                         <% discussion.replies.forEach(reply=> { %>
