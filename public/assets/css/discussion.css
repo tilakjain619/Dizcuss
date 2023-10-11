@@ -121,3 +121,12 @@
     color: #959595;
     align-self: center;
 }
+.flex-menu{
+    display: flex;
+    gap: 10px;
+    margin: 8px 0;
+    font-size: 14px;
+}
+.flex-menu .reported-status{
+    color: #989898;
+}
