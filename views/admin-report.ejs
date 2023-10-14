@@ -33,11 +33,11 @@
     </tr>
     <% reportedDiscussions.forEach(discussion => { %>
       <tr>
-        <td><%= discussion.user.username %></td>
-        <td><%= discussion.content %></td>
+        <td><a href="/member/<%= discussion.user.username %>" target="_blank"><%= discussion.user.username %></a></td>
+        <td><a href="/discussion/<%= discussion._id %>" target="_blank"><%= discussion.content %></a></td>
         <td><%= discussion.reportReason %></td>
-        <td><a href="/admin/approve-report/discussion/<%= discussion._id %>">Approve</a>
-          <a href="/admin/delete-report/discussion/<%= discussion._id %>">Delete</a></td>
+        <td><a class="admin-buttons" href="/admin/approve-report/discussion/<%= discussion._id %>">Approve</a>
+          <a class="admin-buttons" href="/admin/delete-report/discussion/<%= discussion._id %>">Delete</a></td>
       </tr>
     <% }) %>
   </table>
@@ -54,11 +54,11 @@
     </tr>
     <% reportedReplies.forEach(reply => { %>
       <tr>
-        <td><%= reply.user.username %></td>
+        <td><a href="/member/<%= reply.user.username %>" target="_blank"><%= reply.user.username %></a></td>
         <td><%= reply.content %></td>
         <td><%= reply.reportReason %></td>
-        <td><a href="/admin/approve-report/reply/<%= reply._id %>">Approve</a>
-          <a href="/admin/delete-report/reply/<%= reply._id %>">Delete</a></td>
+        <td><a class="admin-buttons" href="/admin/approve-report/reply/<%= reply._id %>">Approve</a>
+          <a class="admin-buttons" href="/admin/delete-report/reply/<%= reply._id %>">Delete</a></td>
       </tr>
     <% }) %>
   </table>

@@ -91,6 +91,6 @@ for (let i = 0; i < tabHeaderElements.length; i++) {
         tabHeaderElements[i].classList.add("active");
         tabBody.querySelector(".active").classList.remove("active");
         tabBodyElements[i].classList.add("active");
-        tabIndicator.style.left = `${i * 25}%`;
+        tabIndicator.style.left = `${i * 110}px`;
     });
 }
