@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Support Page</title>
+</head>
+<body>
+    <h1>Admin Support Page</h1>
+
+    <form>
+        <label for="filter">Filter by:</label>
+        <select id="filterSelect">
+            <option value="All">All</option>
+            <option value="Contact">Contact</option>
+            <option value="Feedback">Feedback</option>
+            <option value="Complaint">Complaint</option>
+        </select>
+    </form>
+
+    <div id="supportRequests">
+        <!-- Support requests will be displayed here -->
+    </div>
+    
+    <div id="support-messages">
+        <!-- Support messages will be displayed here -->
+    </div>
+
+    <script>
+        const filterSelect = document.getElementById('filterSelect');
+        const supportRequestsContainer = document.getElementById('supportRequests');
+        const supportMessagesContainer = document.getElementById('support-messages');
+
+        // Function to fetch support requests from the server
+        const fetchSupportRequestsFromServer = async () => {
+            try {
+                const response = await fetch('/admin/support');
+                const data = await response.json();
+
+                if (response.ok) {
+                    return data.requests;
+                } else {
+                    console.error('Error fetching support requests');
+                    return [];
+                }
+            } catch (error) {
+                console.error(error);
+                return [];
+            }
+        };
+
+        // Function to display support requests
+        const displaySupportRequests = (requests) => {
+            supportRequestsContainer.innerHTML = ''; // Clear previous requests
+
+            requests.forEach(request => {
+                const requestElement = document.createElement('div');
+                requestElement.textContent = `Type: ${request.type}, Message: ${request.content}`;
+                supportRequestsContainer.appendChild(requestElement);
+            });
+        };
+
+        // Function to filter and display support requests on the client side
+        const filterAndDisplaySupportRequests = async (filter) => {
+            const allSupportRequests = await fetchSupportRequestsFromServer();
+
+            if (filter === 'All') {
+                // Display all support requests
+                displaySupportRequests(allSupportRequests);
+            } else {
+                // Filter support requests based on the selected filter
+                const filteredRequests = allSupportRequests.filter(request => request.type === filter);
+                displaySupportRequests(filteredRequests);
+            }
+        };
+
+        // Listen for changes in the filter select element
+        filterSelect.addEventListener('change', () => {
+            const selectedFilter = filterSelect.value;
+            filterAndDisplaySupportRequests(selectedFilter);
+        });
+
+        // Initially load all support requests
+        filterAndDisplaySupportRequests('All');
+    </script>
+</body>
+</html>

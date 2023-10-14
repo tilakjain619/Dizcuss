@@ -1,4 +1,57 @@
 /* home page */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap');
+/* custom alert for login */
+.login-alert{
+    position: fixed;
+    top: 3rem;
+    right: 2rem;
+    z-index: 19;
+    background: var(--yellow);
+    padding: 1rem;
+    border-radius: 5px;
+    color: var(--dark);
+    font-family: "Poppins", sans-serif;
+    animation: popup .3s 1;
+}
+.login-alert h2{
+    font-size: 19px;
+}
+.login-alert div{
+    margin-top: 10px;
+}
+.login-alert div a:hover{
+    text-decoration: underline;
+}
+@keyframes popup {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.4);
+    }
+
+    60% {
+        transform: scale(1.1);
+    }
+
+    70% {
+        transform: scale(1.2);
+    }
+
+    80% {
+        transform: scale(1);
+    }
+
+    90% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+} 
+
 .content-input{
     width: 100%;
     background: transparent;

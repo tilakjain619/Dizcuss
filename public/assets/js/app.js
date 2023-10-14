@@ -114,11 +114,6 @@ async function fetchDiscussions(user) {
     }
 }
 
-// ...
-
-
-// ...
-
 async function handleLikeDislike(event, isLike, isActive) {
     const id = event.target.getAttribute('data-id');
   
@@ -134,7 +129,6 @@ async function handleLikeDislike(event, isLike, isActive) {
         button.classList.toggle('like-active');
         button.classList.toggle('liked');
         oppositeButton.classList.remove('like-active');
-  
         updateLikeDislikeCount(button, isLike, true);
         updateLikeDislikeCount(oppositeButton, !isLike, false);
       }
@@ -157,9 +151,13 @@ async function handleLikeDislike(event, isLike, isActive) {
 
     if (isActive) {
         if (isLike && !increment) {
-            count--; // If it was liked and unliking, decrease count
+            if (count > 0) {
+                count--; // If it was liked and unliking, decrease count if it's not already zero
+            }
         } else if (!isLike && increment) {
-            count--; // If it was disliked and liking, decrease count
+            if (count > 0) {
+                count--; // If it was disliked and liking, decrease count if it's not already zero
+            }
         } else if (isLike && increment) {
             count++; // If it was liked and liking again, increase count
         } else if (!isLike && !increment) {
@@ -169,9 +167,13 @@ async function handleLikeDislike(event, isLike, isActive) {
         if (isLike && increment) {
             count++; // If it was not liked and liking, increase count
         } else if (!isLike && increment) {
-            count--; // If it was not liked and disliking, decrease count
+            if (count > 0) {
+                count--; // If it was not liked and disliking, decrease count if it's not already zero
+            }
         } else if (isLike && !increment) {
-            count--; // If it was not liked and unliking, decrease count
+            if (count > 0) {
+                count--; // If it was not liked and unliking, decrease count if it's not already zero
+            }
         } else if (!isLike && !increment) {
             count++; // If it was not liked and un-disliking, increase count
         }
@@ -181,20 +183,24 @@ async function handleLikeDislike(event, isLike, isActive) {
 }
 
 
-  
 
+  
 discussionsContainer.addEventListener('click', event => {
-    if (event.target.classList.contains('like-discussion-button')) {
-        handleLikeDislike(event, true);
-    }
-    else if (event.target.classList.contains('delete-discussion-button')) {
-        const discussionId = event.target.getAttribute('data-id');
-        const confirmDelete = confirm('Are you sure you want to delete this discussion?');
-        if (confirmDelete) {
-            deleteDiscussion(discussionId);
-        }
-    }
+  if (event.target.classList.contains('like-discussion-button')) {
+      const button = event.target;
+      const isLike = button.classList.contains('like-active');
+      const isActive = button.classList.contains('liked');
+
+      handleLikeDislike(event, isLike, isActive); // Pass isLike and isActive values
+  } else if (event.target.classList.contains('delete-discussion-button')) {
+      const discussionId = event.target.getAttribute('data-id');
+      const confirmDelete = confirm('Are you sure you want to delete this discussion?');
+      if (confirmDelete) {
+          deleteDiscussion(discussionId);
+      }
+  }
 });
+
 
 // submitReplyButton.addEventListener('click', async () => {
 //     const content = replyContentInput.value;

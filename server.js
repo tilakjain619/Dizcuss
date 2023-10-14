@@ -14,7 +14,7 @@ require('dotenv').config();
 const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
 // local connection
-// const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
+const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -663,6 +663,65 @@ app.post('/unfollow/:userId', isLoggedIn, async (req, res) => {
         res.status(500).send('Error fetching feed');
       }
     });
+
+    // Defining a new Mongoose schema for support requests
+const supportSchema = new mongoose.Schema({
+  type: String, // Feedback, Contact, Complaint, etc.
+  content: String,
+  contactInfo: String,
+  createdAt: { type: Date, default: Date.now },
+  isRead: { type: Boolean, default: false },
+});
+
+const SupportRequest = mongoose.model('SupportRequest', supportSchema);
+
+app.get('/support', (req, res) => {
+  res.render('support', { message: 'Your message goes here' });
+});
+
+
+// Creating a new route for submitting support requests
+app.post('/support/submit', async (req, res) => {
+  try {
+      const { type, content, contactInfo } = req.body;
+      const newRequest = new SupportRequest({ type, content, contactInfo });
+      await newRequest.save();
+      res.redirect('/support?message=Request submitted successfully');
+  } catch (error) {
+      res.redirect('/support?message=Error submitting request');
+  }
+});
+
+app.get('/admin/support', async (req, res) => {
+  try {
+      const filter = req.query.filter;
+      // Fetch contactMessages, feedbackMessages, and complaintMessages based on the filter
+      // For example, you might use different Mongoose queries based on the filter value
+      const contactMessages = await SupportRequest.find({ type: 'contact' }).sort({ createdAt: -1 });
+      const feedbackMessages = await SupportRequest.find({ type: 'feedback' }).sort({ createdAt: -1 });
+      const complaintMessages = await SupportRequest.find({ type: 'complaint' }).sort({ createdAt: -1 });
+      // Fetch supportRequests as well
+      const supportRequests = await SupportRequest.find().sort({ createdAt: -1 });
+
+
+      res.json({ requests: supportRequests, contactMessages, feedbackMessages, complaintMessages });
+
+  } catch (error) {
+      res.status(500).json({ message: 'Error fetching support requests' });
+  }
+});
+app.get('/admin/messages', async (req, res) =>{
+  const filter = req.query.filter;
+      // Fetch contactMessages, feedbackMessages, and complaintMessages based on the filter
+      // For example, you might use different Mongoose queries based on the filter value
+      const contactMessages = await SupportRequest.find({ type: 'contact' }).sort({ createdAt: -1 });
+      const feedbackMessages = await SupportRequest.find({ type: 'feedback' }).sort({ createdAt: -1 });
+      const complaintMessages = await SupportRequest.find({ type: 'complaint' }).sort({ createdAt: -1 });
+      // Fetch supportRequests as well
+      const supportRequests = await SupportRequest.find().sort({ createdAt: -1 });
+  res.render('admin-support', { requests: supportRequests, contactMessages, feedbackMessages, complaintMessages, filter });
+})
+
 
     app.get('/admin/reported-content', isAdmin, async (req, res) => {
       try {

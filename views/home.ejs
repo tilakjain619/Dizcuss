@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="../assets/css/home.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js" defer></script>
+<script type="text/javascript" src="../assets/js/app.js" defer></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | Dizcuss</title>
 </head>
@@ -73,17 +74,38 @@
                                     <%= discussion.likes %>
                                 </span>
                             </button>
-                            <% if (discussion.reported) { %>
-                                <p class="reported-status"><i class="fa fa-flag" aria-hidden="true"></i> Reported</p>
-                              <% } %>
-                            <!-- <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button> -->
-                            <% if (user && user._id.toString() === discussion.user._id.toString()) { %>
-                                <button class="delete-discussion-button discussion-btn" data-id="<%= discussion._id %>">Delete</button>
-                            <% } %>
-                            <a href="#" class="report-button" onclick="reportContent('discussion', '<%= discussion._id %>')">Report</a>
+                            <div class="flex-menu">
+                                <% if (discussion.reported) { %>
+                                    <p class="reported-status" data-tooltip="This Discussion was reported by a user and might contain sensitive input."><i class="fa fa-flag" aria-hidden="true"></i>
+                                        Reported</p>
+                                    <% } %>
+                                <div class="dropdown">
+                                    <a data-toggle="dropdown" class="dropbtn"><i class="fa fa-ellipsis-h"
+                                            aria-hidden="true"></i></a>
+                                    <!-- <span class="glyphicon glyphicon-option-vertical"> </span>-->
+                                    <ul class="dropdown-content">
+                                        <% if (user && user._id.toString()===discussion.user._id.toString()) { %>
+                                            <li>
+                                                <a href="#" class="delete-discussion-button discussion-btn"
+                                                    data-id="<%= discussion._id %>">Delete</a>
+                                            </li>
+                                            <% } %>
+                                                <li>
+                                                    <a href="#" class="report-button"
+                                                        onclick="reportContent('discussion', '<%= discussion._id %>')">Report</a>
+                                                </li>
+                                    </ul>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
-
+                    <% if(!user){ %>
+                        <div class="login-alert">
+                            <h2>You're not logged in!</h2>
+                            <div><a href="/login">Let's go login</a></div>
+                        </div>
+                    <% } %>
                     <!-- hidden: replies on feed -->
                     <!-- <div class="reply-card">
                         <% discussion.replies.forEach(reply=> { %>
@@ -129,7 +151,28 @@
                 <!-- Add other content here -->
             </div>
         </div>
-        <script type="text/javascript" src="../assets/js/app.js"></script>
+        <script>
+             // dropdown for options on replies 
+             const dropdownMenus = document.querySelectorAll('.dropbtn');
+const dropdowns = document.querySelectorAll('.dropdown-content');
+
+// Add a click event listener to each dropdown button
+dropdownMenus.forEach((dropdownMenu, index) => {
+  dropdownMenu.addEventListener('click', () => {
+    // Toggle the display of the corresponding dropdown
+    dropdowns[index].style.display = (dropdowns[index].style.display === 'block') ? 'none' : 'block';
+  });
+});
+
+// Add a click event listener to the document to close the dropdowns when clicking outside
+document.addEventListener('click', function (event) {
+  dropdowns.forEach((dropdown, index) => {
+    if (!dropdown.contains(event.target) && !dropdownMenus[index].contains(event.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+});
+        </script>
 </body>
 
 </html>

@@ -1,0 +1,72 @@
+<!-- HTML for the support page -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Support Page</title>
+</head>
+<body>
+    <h1>Support Page</h1>
+    <!-- Display a message if there is one -->
+    <% if (message) { %>
+        <p id="message"><%= message %></p>
+    <% } %>
+
+    <!-- Support request form -->
+    <form action="/support/submit" method="post">
+        <label for="type">Type:</label>
+        <select name="type" id="type">
+            <option value="Feedback">Feedback</option>
+            <option value="Contact">Contact</option>
+            <option value="Complaint">Complaint</option>
+        </select><br>
+
+        <label for="content">Content:</label>
+        <textarea name="content" id="content" rows="4" cols="50" required></textarea><br>
+
+        <label for="contactInfo">Contact Information:</label>
+        <input type="text" name="contactInfo" id="contactInfo" required><br>
+
+        <button type="submit">Submit Request</button>
+    </form>
+
+    <script>
+        const supportForm = document.getElementById('supportForm');
+    const messageElement = document.getElementById('message');
+
+    supportForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Serialize form data into a JSON object
+        const formData = new FormData(supportForm);
+        const formDataJSON = {};
+        formData.forEach((value, key) => {
+            formDataJSON[key] = value;
+        });
+
+        // Send a POST request to the server
+        try {
+            const response = await fetch('/support/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formDataJSON),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                messageElement.textContent = data.message;
+            } else {
+                messageElement.textContent = 'Error submitting the request.';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            messageElement.textContent = 'An error occurred. Please try again later.';
+        }
+    });
+    </script>
+</body>
+</html>
