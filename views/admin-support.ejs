@@ -21,16 +21,9 @@
     <div id="supportRequests">
         <!-- Support requests will be displayed here -->
     </div>
-    
-    <div id="support-messages">
-        <!-- Support messages will be displayed here -->
-    </div>
-
     <script>
         const filterSelect = document.getElementById('filterSelect');
         const supportRequestsContainer = document.getElementById('supportRequests');
-        const supportMessagesContainer = document.getElementById('support-messages');
-
         // Function to fetch support requests from the server
         const fetchSupportRequestsFromServer = async () => {
             try {
@@ -49,13 +42,41 @@
             }
         };
 
+        // Function to delete a support request
+        const deleteSupportRequest = async (requestId) => {
+            try {
+                const response = await fetch(`/admin/support/delete/${requestId}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    // Request was deleted successfully, update the UI
+                    const deletedElement = document.getElementById(`support-request-${requestId}`);
+                    if (deletedElement) {
+                        deletedElement.remove();
+                    }
+                } else {
+                    console.error('Error deleting support request');
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
         // Function to display support requests
         const displaySupportRequests = (requests) => {
             supportRequestsContainer.innerHTML = ''; // Clear previous requests
 
             requests.forEach(request => {
                 const requestElement = document.createElement('div');
-                requestElement.textContent = `Type: ${request.type}, Message: ${request.content}`;
+                requestElement.textContent = `Type: ${request.type}, Message: ${request.content}, Email: ${request.contactInfo}`;
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => {
+                    deleteSupportRequest(request._id);
+                });
+                requestElement.appendChild(deleteButton);
+                requestElement.id = `support-request-${request._id}`;
                 supportRequestsContainer.appendChild(requestElement);
             });
         };

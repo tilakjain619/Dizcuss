@@ -142,3 +142,17 @@
 .liked{
     color: var(--yellow);
 }
+.like-discussion-button:active .fa-hands-clapping{
+    animation: justliked .3s 1 ease-in;
+}
+@keyframes justliked {
+    25% {
+      transform: scale(.3);
+    }
+    50% {
+    transform: scale(.6);
+    }
+    75% {
+        transform: scale(1);
+    }
+  }

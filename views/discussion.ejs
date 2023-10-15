@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="../assets/css/discussion.css">
     <link rel="apple-touch-icon" sizes="180x180" href="../assets/photos/brand/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/photos/brand/favicon-32x32.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js" defer></script>
@@ -19,7 +21,7 @@
 
     <body>
         <iframe src="../trending.html" class="most-trending-discussion-container" frameborder="0"></iframe>
-        <div class="home-container">
+        <div class="home-container" id="discussions">
 
             <% function formatTimestamp(createdAt) { const now=new Date(); const diffInMilliseconds=now - createdAt; if
                 (diffInMilliseconds < 60000) { return `${Math.floor(diffInMilliseconds / 1000)} seconds ago`; } else if
@@ -66,6 +68,7 @@
                                             @<%= reply.user.username %>
                                         </p>
                                     </a>
+                                    
                                     <p class="reply-time">
                                         <%= formattedTimestampReply %>
                                     </p>
@@ -73,27 +76,36 @@
                                         <%= reply.content %>
                                     </p>
                                     <div class="flex-menu">
+                                        <!-- <button class="like-button discussion-btn" data-id="<%= reply._id %>">
+                                            <i class="fa-solid fa-hands-clapping"></i>
+                                            <span class="count">
+                                                <%= reply.likes %>
+                                            </span>
+                                        </button> -->
                                         <% if (reply.reported) { %>
-                                            <p class="reported-status" data-tooltip="This Discussion was reported by a user and might contain sensitive input."><i class="fa fa-flag" aria-hidden="true"></i>
+                                            <p class="reported-status"
+                                                data-tooltip="This Discussion was reported by a user and might contain sensitive input.">
+                                                <i class="fa fa-flag" aria-hidden="true"></i>
                                                 Reported</p>
                                             <% } %>
-                                        <div class="dropdown">
-                                            <a data-toggle="dropdown" class="dropbtn"><i class="fa fa-ellipsis-h"
-                                                    aria-hidden="true"></i></a>
-                                            <!-- <span class="glyphicon glyphicon-option-vertical"> </span>-->
-                                            <ul class="dropdown-content">
-                                                <% if (user && user._id.toString()===reply.user._id.toString()) { %>
-                                                    <li>
-                                                        <a href="#" class="delete-reply-button discussion-btn"
-                                                            data-id="<%= reply._id %>">Delete</a>
-                                                    </li>
-                                                    <% } %>
-                                                        <li>
-                                                            <a href="#" class="report-button"
-                                                                onclick="reportContent('reply', '<%= reply._id %>')">Report</a>
-                                                        </li>
-                                            </ul>
-                                        </div>
+                                                <div class="dropdown">
+                                                    <a data-toggle="dropdown" class="dropbtn"><i
+                                                            class="fa fa-ellipsis-h" aria-hidden="true"></i></a>
+                                                    <!-- <span class="glyphicon glyphicon-option-vertical"> </span>-->
+                                                    <ul class="dropdown-content">
+                                                        <% if (user && user._id.toString()===reply.user._id.toString())
+                                                            { %>
+                                                            <li>
+                                                                <a href="#" class="delete-reply-button discussion-btn"
+                                                                    data-id="<%= reply._id %>">Delete</a>
+                                                            </li>
+                                                            <% } %>
+                                                                <li>
+                                                                    <a href="#" class="report-button"
+                                                                        onclick="reportContent('reply', '<%= reply._id %>')">Report</a>
+                                                                </li>
+                                                    </ul>
+                                                </div>
                                     </div>
                                 </li>
                                 <% }); %>
@@ -113,24 +125,24 @@
             });
             // dropdown for options on replies 
             const dropdownMenus = document.querySelectorAll('.dropbtn');
-const dropdowns = document.querySelectorAll('.dropdown-content');
+            const dropdowns = document.querySelectorAll('.dropdown-content');
 
-// Add a click event listener to each dropdown button
-dropdownMenus.forEach((dropdownMenu, index) => {
-  dropdownMenu.addEventListener('click', () => {
-    // Toggle the display of the corresponding dropdown
-    dropdowns[index].style.display = (dropdowns[index].style.display === 'block') ? 'none' : 'block';
-  });
-});
+            // Add a click event listener to each dropdown button
+            dropdownMenus.forEach((dropdownMenu, index) => {
+                dropdownMenu.addEventListener('click', () => {
+                    // Toggle the display of the corresponding dropdown
+                    dropdowns[index].style.display = (dropdowns[index].style.display === 'block') ? 'none' : 'block';
+                });
+            });
 
-// Add a click event listener to the document to close the dropdowns when clicking outside
-document.addEventListener('click', function (event) {
-  dropdowns.forEach((dropdown, index) => {
-    if (!dropdown.contains(event.target) && !dropdownMenus[index].contains(event.target)) {
-      dropdown.style.display = 'none';
-    }
-  });
-});
+            // Add a click event listener to the document to close the dropdowns when clicking outside
+            document.addEventListener('click', function (event) {
+                dropdowns.forEach((dropdown, index) => {
+                    if (!dropdown.contains(event.target) && !dropdownMenus[index].contains(event.target)) {
+                        dropdown.style.display = 'none';
+                    }
+                });
+            });
 
         </script>
         <script src="../assets/js/app.js"></script>

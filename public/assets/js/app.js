@@ -114,29 +114,44 @@ async function fetchDiscussions(user) {
     }
 }
 
-async function handleLikeDislike(event, isLike, isActive) {
+// async function handleLikeDislike(event, isLike, isActive) {
+//     const id = event.target.getAttribute('data-id');
+  
+//     try {
+//       const response = await fetch(`/api/likes/${id}`, {
+//         method: 'PUT'
+//       });
+  
+//       if (response.ok) {
+//         const button = event.target;
+//         const oppositeButton = isLike ? button.nextElementSibling : button.previousElementSibling;
+  
+//         button.classList.toggle('like-active');
+//         button.classList.toggle('liked');
+//         oppositeButton.classList.remove('like-active');
+//         updateLikeDislikeCount(button, isLike, true);
+//         updateLikeDislikeCount(oppositeButton, !isLike, false);
+//       }
+//     } catch (error) {
+//       console.error('Error handling like/dislike:', error);
+//     }
+//   }
+  async function handleLikeDislike(event) {
     const id = event.target.getAttribute('data-id');
   
     try {
-      const response = await fetch(`/api/likes/${id}`, {
-        method: 'PUT'
-      });
+        const response = await fetch(`/api/likes/${id}`, {
+            method: 'PUT'
+        });
   
-      if (response.ok) {
-        const button = event.target;
-        const oppositeButton = isLike ? button.nextElementSibling : button.previousElementSibling;
-  
-        button.classList.toggle('like-active');
-        button.classList.toggle('liked');
-        oppositeButton.classList.remove('like-active');
-        updateLikeDislikeCount(button, isLike, true);
-        updateLikeDislikeCount(oppositeButton, !isLike, false);
-      }
+        if (response.ok) {
+            const button = event.target;
+            updateLikeDislikeCount(button);
+        }
     } catch (error) {
-      console.error('Error handling like/dislike:', error);
+        console.error('Error handling clap:', error);
     }
-  }
-  
+}
   // Add an event listener to like and dislike buttons
   discussionsContainer.addEventListener('click', event => {
     if (event.target.classList.contains('like-button')) {
@@ -148,37 +163,7 @@ async function handleLikeDislike(event, isLike, isActive) {
   function updateLikeDislikeCount(button, isActive, isLike, increment) {
     const countElement = button.querySelector('.count');
     let count = parseInt(countElement.textContent);
-
-    if (isActive) {
-        if (isLike && !increment) {
-            if (count > 0) {
-                count--; // If it was liked and unliking, decrease count if it's not already zero
-            }
-        } else if (!isLike && increment) {
-            if (count > 0) {
-                count--; // If it was disliked and liking, decrease count if it's not already zero
-            }
-        } else if (isLike && increment) {
-            count++; // If it was liked and liking again, increase count
-        } else if (!isLike && !increment) {
-            count++; // If it was disliked and un-disliking, increase count
-        }
-    } else {
-        if (isLike && increment) {
-            count++; // If it was not liked and liking, increase count
-        } else if (!isLike && increment) {
-            if (count > 0) {
-                count--; // If it was not liked and disliking, decrease count if it's not already zero
-            }
-        } else if (isLike && !increment) {
-            if (count > 0) {
-                count--; // If it was not liked and unliking, decrease count if it's not already zero
-            }
-        } else if (!isLike && !increment) {
-            count++; // If it was not liked and un-disliking, increase count
-        }
-    }
-
+    count++; // Increment the clap count
     countElement.textContent = count;
 }
 
@@ -243,9 +228,6 @@ discussionsContainer.addEventListener('click', event => {
         handleLikeDislike(event, true);
     }
 });
-
-// ...
-
 const discussionForm = document.getElementById('discussion-form');
 
 
@@ -372,8 +354,6 @@ document.addEventListener("DOMContentLoaded", () => {
                                 </p>
                                 <p class="reply-time">${ formatTimestamp(reply.createdAt) }</p>
                                 <button class="like-button discussion-btn" data-id="${reply._id}">Like (${reply.likes}
-                                        )</button>
-                                <button class="dislike-button discussion-btn" data-id="${reply._id}">Dislike (${reply.dislikes}
                                         )</button>
                             </div></div>
             `)
