@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="../assets/photos/brand/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="../assets/photos/brand/favicon-16x16.png">
     <link rel="stylesheet" href="../assets/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js" defer></script>
 <script type="text/javascript" src="../assets/js/app.js" defer></script>
@@ -69,7 +70,7 @@
                         <div class="discussion-toolbar">
                         <a class="reply-button discussion-btn" href="/discussion/<%= discussion._id %>"><%= replyCount %> Replies</a>
                             <button class="like-discussion-button discussion-btn" data-id="<%= discussion._id %>">
-                                <i class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                <i class="fa-solid fa-hands-clapping"></i>
                                 <span class="count">
                                     <%= discussion.likes %>
                                 </span>

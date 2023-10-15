@@ -14,7 +14,7 @@ require('dotenv').config();
 const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
 // local connection
-const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
+// const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -422,16 +422,7 @@ mongoose.connect(atlasConnectionString, {
 
         const user = req.user;
 
-        // Check if the user has already liked this discussion
-        if (user.likedDiscussions.includes(discussion._id)) {
-          // If yes, remove the like
-          user.likedDiscussions.pull(discussion._id);
-          discussion.likes--;
-        } else {
-          // If no, add the like
-          user.likedDiscussions.push(discussion._id);
           discussion.likes++;
-        }
 
         // Save the changes
         await user.save();
@@ -445,37 +436,29 @@ mongoose.connect(atlasConnectionString, {
 
 
 
-    // Route for handling likes for replies
-    app.put('/api/likes/:replyId', isLoggedIn, async (req, res) => {
-      try {
-        const reply = await Reply.findById(req.params.replyId);
+    // // Route for handling likes for replies
+    // app.put('/api/likes/:replyId', isLoggedIn, async (req, res) => {
+    //   try {
+    //     const reply = await Reply.findById(req.params.replyId);
 
-        if (!reply) {
-          return res.status(404).json({ message: 'Reply not found' });
-        }
+    //     if (!reply) {
+    //       return res.status(404).json({ message: 'Reply not found' });
+    //     }
 
-        const user = req.user;
+    //     const user = req.user;
 
-        // Check if the user has already liked this reply
-        if (user.likedReplies.includes(reply._id)) {
-          // If yes, remove the like
-          user.likedReplies.pull(reply._id);
-          reply.likes--;
-        } else {
-          // If no, add the like
-          user.likedReplies.push(reply._id);
-          reply.likes++;
-        }
+    //       reply.likes++;
 
-        // Save the changes
-        await user.save();
-        await reply.save();
 
-        res.json(reply);
-      } catch (error) {
-        res.status(500).json({ message: 'Error updating likes' });
-      }
-    });
+    //     // Save the changes
+    //     await user.save();
+    //     await reply.save();
+
+    //     res.json(reply);
+    //   } catch (error) {
+    //     res.status(500).json({ message: 'Error updating likes' });
+    //   }
+    // });
 
     // Define a route to get a user's profile by username
     app.get('/member/:username', async (req, res) => {
@@ -676,7 +659,7 @@ const supportSchema = new mongoose.Schema({
 const SupportRequest = mongoose.model('SupportRequest', supportSchema);
 
 app.get('/support', (req, res) => {
-  res.render('support', { message: 'Your message goes here' });
+  res.render('support');
 });
 
 
@@ -692,7 +675,7 @@ app.post('/support/submit', async (req, res) => {
   }
 });
 
-app.get('/admin/support', async (req, res) => {
+app.get('/admin/support', isAdmin, async (req, res) => {
   try {
       const filter = req.query.filter;
       // Fetch contactMessages, feedbackMessages, and complaintMessages based on the filter
@@ -710,7 +693,7 @@ app.get('/admin/support', async (req, res) => {
       res.status(500).json({ message: 'Error fetching support requests' });
   }
 });
-app.get('/admin/messages', async (req, res) =>{
+app.get('/admin/messages', isAdmin, async (req, res) =>{
   const filter = req.query.filter;
       // Fetch contactMessages, feedbackMessages, and complaintMessages based on the filter
       // For example, you might use different Mongoose queries based on the filter value
@@ -721,7 +704,24 @@ app.get('/admin/messages', async (req, res) =>{
       const supportRequests = await SupportRequest.find().sort({ createdAt: -1 });
   res.render('admin-support', { requests: supportRequests, contactMessages, feedbackMessages, complaintMessages, filter });
 })
+// Endpoint to delete a support request
+app.delete('/admin/support/delete/:requestId', async (req, res) => {
+  try {
+    const requestId = req.params.requestId;
 
+    // Use Mongoose to find and delete the request by ID
+    const deletedRequest = await SupportRequest.findByIdAndDelete(requestId);
+
+    if (deletedRequest) {
+      res.sendStatus(200);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (error) {
+    console.error('Error deleting support request:', error);
+    res.status(500).json({ message: 'Error deleting support request' });
+  }
+});
 
     app.get('/admin/reported-content', isAdmin, async (req, res) => {
       try {
