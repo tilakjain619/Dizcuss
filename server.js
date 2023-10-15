@@ -11,7 +11,7 @@ const passportLocalMongoose = require('passport-local-mongoose');
 require('dotenv').config();
 
 // atlas connection
-const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
+// const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
 // local connection
 const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
@@ -194,7 +194,7 @@ const replySchema = new mongoose.Schema({
 const Discussion = mongoose.model('Discussion', discussionSchema);
 const Reply = mongoose.model('Reply', replySchema);
 
-mongoose.connect(atlasConnectionString, {
+mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
@@ -676,7 +676,7 @@ const supportSchema = new mongoose.Schema({
 const SupportRequest = mongoose.model('SupportRequest', supportSchema);
 
 app.get('/support', (req, res) => {
-  res.render('support', { message: 'Your message goes here' });
+  res.render('support');
 });
 
 
@@ -692,7 +692,7 @@ app.post('/support/submit', async (req, res) => {
   }
 });
 
-app.get('/admin/support', async (req, res) => {
+app.get('/admin/support', isAdmin, async (req, res) => {
   try {
       const filter = req.query.filter;
       // Fetch contactMessages, feedbackMessages, and complaintMessages based on the filter
@@ -710,7 +710,7 @@ app.get('/admin/support', async (req, res) => {
       res.status(500).json({ message: 'Error fetching support requests' });
   }
 });
-app.get('/admin/messages', async (req, res) =>{
+app.get('/admin/messages', isAdmin, async (req, res) =>{
   const filter = req.query.filter;
       // Fetch contactMessages, feedbackMessages, and complaintMessages based on the filter
       // For example, you might use different Mongoose queries based on the filter value
