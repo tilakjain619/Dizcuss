@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>About Dizcuss</title>
+    <style>
+        .about-container{
+            margin-top: 4rem;
+        }
+        .about-logo{
+            text-align: center;
+        }
+        .about-logo img{
+            width: min(400px, 100%);
+        }
+        article p{
+            font-family: 'Poppins', sans-serif;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="main-navbar">
+        <span class="navbar-toggle" id="js-navbar-toggle">
+            <i class="fas fa-bars"></i>
+        </span>
+        <a href="#" class="logo"><img src="./assets/photos/brand/light-logo.svg" alt="Dizcuss Logo"></a>
+        <ul class="main-nav" id="js-menu">
+            <li>
+                <a href="/home" class="nav-links">Community</a>
+            </li>
+            <li>
+                <a href="/signup" class="nav-links">Get Started</a>
+            </li>
+            <li>
+                <a href="/login" class="nav-links">Sign in</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="home-container about-container">
+        <figure class="about-logo">
+            <img src="../assets/photos/brand/light-logo.svg" alt="dizcuss logo">
+        </figure>
+        <article>
+            <p>
+                Dizcuss is not just a company; it's a visionary hub of innovation and creativity. Born from the collective imaginations of a diverse team of dreamers and problem solvers, Dizcuss is a place where ideas come to life. At its core, Dizcuss thrives on the idea that conversations can change the world. With a mission to connect people from every corner of the globe, Dizcuss has crafted a platform that fosters meaningful dialogue, breaking down barriers, and transcending borders. It's a virtual agora where thoughts and opinions flow freely, a place where voices are heard, and where change is not just possible but inevitable.
+            </p>
+            <p>
+                Dizcuss believes that by enabling people to communicate and share their insights, we can collectively tackle the most pressing issues of our time. In this imaginative realm, discussions aren't just idle chatter but catalysts for transformation. Whether it's debating the future of technology, discussing solutions for environmental conservation, or simply sharing stories and experiences, Dizcuss embraces the diversity of human thought.
+            </p>
+        </article>
+    </main>
+
+    <footer class="footer">
+        <div class="upper-footer">
+            <div class="footer-container">
+                <img class="img-responsive footer-logo" src="./assets/photos/brand/dark-logo.svg" alt="Dizcuss" />
+                <ul class="list-inline navigation">
+                    <li><a href="/home">Explore</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/support">Support</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="lower-footer">
+            <div class="container">
+                <p class="lower-footer-text"> &copy;&nbsp;Dizcuss - A Discussion Forum</p>
+            </div>
+        </div>
+    </footer>
+    <script src="../assets/js/script.js"></script>
+<script>
+    let mainNav = document.getElementById("js-menu");
+let navBarToggle = document.getElementById("js-navbar-toggle");
+
+navBarToggle.addEventListener("click", function() {
+  mainNav.classList.toggle("show-active");
+});
+</script>
+</body>
+</html>

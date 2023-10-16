@@ -3,24 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin-report.css">
+    <link rel="stylesheet" href="../assets/css/sidebar.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
     <title>Admin Support Page</title>
 </head>
 <body>
-    <h1>Admin Support Page</h1>
+    <header>
+        <div class="toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <h3>
+            Messages
+        </h3>
+        <a href="/logout">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </header>
+    <nav>
+        <ul class="sidebar-menu-links">
+            <li class="d-logo">
+                <img src="../assets/photos/brand/favicon-32x32.png" alt="our logo">
+            </li>
+            <li>
+                <a class="toggle">
+                    <span class="icon"><i class="fas fa-bars"></i></span>
+                    <span class="title">Menu</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin">
+                    <span class="icon"><i class="fa fa-address-card" aria-hidden="true"></i></span>
+                    <span class="title">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/reported-content">
+                    <span class="icon"><i class="fa fa-flag" aria-hidden="true"></i>
 
-    <form>
-        <label for="filter">Filter by:</label>
-        <select id="filterSelect">
-            <option value="All">All</option>
-            <option value="Contact">Contact</option>
-            <option value="Feedback">Feedback</option>
-            <option value="Complaint">Complaint</option>
-        </select>
-    </form>
-
-    <div id="supportRequests">
-        <!-- Support requests will be displayed here -->
-    </div>
+                    </span>
+                    <span class="title">Reported Content</span>
+                </a>
+            </li>
+            <li>
+                <a href="/logout">
+                    <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="title">Sign Out</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <section class="home-container">
+        <form>
+            <label for="filter">Filter by:</label>
+            <select id="filterSelect" class="classic">
+                <option value="All">All</option>
+                <option value="Contact">Contact</option>
+                <option value="Feedback">Feedback</option>
+                <option value="Complaint">Complaint</option>
+            </select>
+        </form>
+    
+        <div id="supportRequests" class="message-container">
+            <!-- Support requests will be displayed here -->
+        </div>
+    </section>
     <script>
         const filterSelect = document.getElementById('filterSelect');
         const supportRequestsContainer = document.getElementById('supportRequests');
@@ -104,5 +155,6 @@
         // Initially load all support requests
         filterAndDisplaySupportRequests('All');
     </script>
+    <script src="../assets/js/script.js"></script>
 </body>
 </html>

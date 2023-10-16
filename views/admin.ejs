@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/admin-report.css">
+    <link rel="stylesheet" href="../assets/css/sidebar.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin @ Dizcuss</title>
+</head>
+<body>
+    <header>
+        <div class="toggle">
+            <i class="fas fa-bars"></i>
+        </div>
+        <h3>
+            Admin
+        </h3>
+        <a href="/logout">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </header>
+    <nav>
+        <ul class="sidebar-menu-links">
+            <li class="d-logo">
+                <img src="../assets/photos/brand/favicon-32x32.png" alt="our logo">
+            </li>
+            <li>
+                <a class="toggle">
+                    <span class="icon"><i class="fas fa-bars"></i></span>
+                    <span class="title">Menu</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/messages">
+                    <span class="icon"><i class="fa fa-flag" aria-hidden="true"></i>
+
+                    </span>
+                    <span class="title">Reported Content</span>
+                </a>
+            </li>
+            <li>
+                <a href="/admin/messages">
+                    <span class="icon"><i class="fa fa-comment" aria-hidden="true"></i>
+                    </span>
+                    <span class="title">Messages</span>
+                </a>
+            </li>
+            <li>
+                <a href="/logout">
+                    <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="title">Sign Out</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+    <section class="home-container">
+    <h2>Admin Dashboard</h2>
+    
+    <div class="admin-box-container">
+        <div class="admin-box"><p>Total Discussions: <%= totalDiscussions %></p></div>
+    <div class="admin-box"><p>Total Replies: <%= totalReplies %></p></div>
+    <a href="/admin/reported-content" class="admin-box"><div><p>Reported Content</p></div></a>
+    <a href="/admin/messages" class="admin-box"><div><p>Messages</p></div></a>
+    </div>
+    </section>
+    <script src="../assets/js/script.js"></script>
+</body>
+</html>

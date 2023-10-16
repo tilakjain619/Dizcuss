@@ -70,6 +70,9 @@ const isLoggedIn = (req, res, next) => {
 // app.get('/', (req, res) => {
 //   res.send('Welcome to Dizcuss');
 // });
+app.get('/about', (req, res) => {
+  res.render('about');
+});
 
 app.get('/signup', (req, res) => {
   res.render('signup');
@@ -662,7 +665,20 @@ app.get('/support', (req, res) => {
   res.render('support');
 });
 
+// Create a new route for the /admin page
+app.get('/admin', isAdmin, async (req, res) => {
+  try {
+    // Use Mongoose queries to count the total number of discussions and replies
+    const totalDiscussions = await Discussion.countDocuments();
+    const totalReplies = await Reply.countDocuments();
 
+    // Render an admin dashboard page with the count of discussions and replies
+    res.render('admin', { totalDiscussions, totalReplies, user: req.user });
+  } catch (error) {
+    console.error('Error fetching admin data:', error);
+    res.status(500).json({ message: 'Error fetching admin data' });
+  }
+});
 // Creating a new route for submitting support requests
 app.post('/support/submit', async (req, res) => {
   try {
