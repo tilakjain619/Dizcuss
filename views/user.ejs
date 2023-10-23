@@ -44,7 +44,7 @@
                 <button id="followButton" data-user-id="<%= user._id %>" class="follow-button">Follow</button> 
             <% } %>
         </div>
-        <p>Following: <%= user.following.length  %></p>
+        <p class="following-chip">Following: <%= user.following.length  %></p>
 
         <div class="tab">
             <button class="tablinks" onclick="openTab(event, 'User-Discussion')">Discussions</button>

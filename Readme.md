@@ -7,14 +7,13 @@ Welcome to the **Dizcuss - A Discussion Forum** GitHub repository! This reposito
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
-- [Contributing](#contributing)
 
 ## Introduction
 Dizcuss is a web application that allows users to engage in discussions and provide feedback on various topics. This platform is designed to facilitate easy communication and collaboration among users. It's built using a combination of frontend and backend technologies, providing a seamless experience for users to share their thoughts.
 
 ## Features
 - **User Authentication:** Users can create accounts, log in, and log out securely.
-- **Discussion Threads:** Users can initiate and participate in discussion threads on different topics.
+- **Discussion Threads:** Users can initiate and participate in discussion posts on different topics.
 - **Feedback Board:** Dedicated section for users to share feedback and suggestions.
 - **Responsive Design:** The interface is responsive, ensuring optimal user experience across devices.
 - **Database Integration:** MongoDB is used to store user data, discussions, and feedback securely.
@@ -35,7 +34,7 @@ Dizcuss is a web application that allows users to engage in discussions and prov
    npm install
    ```
 
-4. Create a `.env` file in the root directory and provide your MongoDB connection string:
+4. (Optional, you can use local Mongodb too) Create a `.env` file in the root directory and provide your MongoDB connection string:
    ```
    MONGODB_URI=your-mongodb-connection-string
    ```
@@ -46,21 +45,8 @@ Dizcuss is a web application that allows users to engage in discussions and prov
    npm start
    ```
 
-2. Open your web browser and visit `http://localhost:3000` to access the Dizcuss application.
+2. Open your web browser and visit `http://localhost:3000` to access the Dizcuss forum.
 
 3. Register an account or log in to an existing account.
 
-4. Explore discussion threads, contribute to discussions, and provide feedback on the feedback board.
-
-## Contributing
-Contributions are welcome! If you'd like to contribute to the project, please follow these steps:
-1. Fork the repository.
-2. Create a new branch for your feature or improvement.
-3. Make your changes and commit them.
-4. Push your changes to your fork.
-5. Create a pull request describing your changes.
-
-
----
-
-Thank you for your interest in **Dizcuss - A Discussion Forum**! If you encounter any issues or have suggestions, please feel free to [create an issue](https://github.com/tilakjain619/dizcuss/issues). We look forward to your contributions ⚡
+4. Explore discussion posts, contribute to discussions, and provide feedback in reply section or support page.
