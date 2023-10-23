@@ -220,7 +220,7 @@ background: linear-gradient(315deg, #F945CE, #651513);
     padding: 12px;
     width: 100%;
     display: flex;
-    gap: 14px;
+    gap: 4px;
     align-items: center;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -246,4 +246,25 @@ background: linear-gradient(315deg, #F945CE, #651513);
   }
   .message-container div button:hover{
     opacity: .7;
+  }
+  .contact-type{
+    place-items: center;
+    width: 63px;
+    display: grid;
+    height: 31px;
+    font-size: 10px;
+    border-radius: 25px;
+    color: black;
+    background-color: #ffffff9e;
+  }
+  .contact-time{
+    place-items: center;
+    padding: 17px;
+    display: grid;
+    height: 14px;
+    font-size: 10px;
+    border-radius: 25px;
+    color: black;
+    background-color: #57a4ffdb;
+    align-content: space-around;
   }

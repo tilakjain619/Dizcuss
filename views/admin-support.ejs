@@ -120,10 +120,23 @@
         // Function to display support requests
         const displaySupportRequests = (requests) => {
             supportRequestsContainer.innerHTML = ''; // Clear previous requests
-
             requests.forEach(request => {
+                const timestamp = request.createdAt;
+                const date = new Date(timestamp);
+
+const istOptions = {
+  timeZone: 'Asia/Kolkata',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: true, // Use 12-hour format
+};
+
+const formattedTimestamp = date.toLocaleString('en-IN', istOptions);
                 const requestElement = document.createElement('div');
-                requestElement.textContent = `Type: ${request.type}, Message: ${request.content}, Email: ${request.contactInfo}`;
+                requestElement.innerHTML = `<span class="contact-type">${request.type}</span>Message: ${request.content}, Email: ${request.contactInfo} <span class="contact-time">${formattedTimestamp}</span>`;
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Delete';
                 deleteButton.addEventListener('click', () => {

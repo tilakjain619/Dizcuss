@@ -5,7 +5,6 @@ const passport = require('passport');
 const session = require('express-session');
 const LocalStrategy = require('passport-local').Strategy;
 
-// const User = require('../models/user');
 const passportLocalMongoose = require('passport-local-mongoose');
 
 require('dotenv').config();
@@ -709,17 +708,32 @@ app.get('/admin/support', isAdmin, async (req, res) => {
       res.status(500).json({ message: 'Error fetching support requests' });
   }
 });
-app.get('/admin/messages', isAdmin, async (req, res) =>{
+app.get('/admin/messages', isAdmin, async (req, res) => {
   const filter = req.query.filter;
-      // Fetch contactMessages, feedbackMessages, and complaintMessages based on the filter
-      // For example, you might use different Mongoose queries based on the filter value
-      const contactMessages = await SupportRequest.find({ type: 'contact' }).sort({ createdAt: -1 });
-      const feedbackMessages = await SupportRequest.find({ type: 'feedback' }).sort({ createdAt: -1 });
-      const complaintMessages = await SupportRequest.find({ type: 'complaint' }).sort({ createdAt: -1 });
-      // Fetch supportRequests as well
-      const supportRequests = await SupportRequest.find().sort({ createdAt: -1 });
-  res.render('admin-support', { requests: supportRequests, contactMessages, feedbackMessages, complaintMessages, filter });
-})
+  
+  try {
+    // Fetch contactMessages, feedbackMessages, and complaintMessages based on the filter
+    // For example, you might use different Mongoose queries based on the filter value
+    const contactMessages = await SupportRequest.find({ type: 'contact' }).sort({ createdAt: -1 });
+    const feedbackMessages = await SupportRequest.find({ type: 'feedback' }).sort({ createdAt: -1 });
+    const complaintMessages = await SupportRequest.find({ type: 'complaint' }).sort({ createdAt: -1 });
+    
+    // Fetch supportRequests as well
+    const supportRequests = await SupportRequest.find().sort({ createdAt: -1 });
+
+    res.render('admin-support', { 
+      requests: supportRequests, 
+      contactMessages, 
+      feedbackMessages, 
+      complaintMessages, 
+      filter
+    });
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // Endpoint to delete a support request
 app.delete('/admin/support/delete/:requestId', async (req, res) => {
   try {
