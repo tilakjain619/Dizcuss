@@ -140,7 +140,12 @@ select {
     border-color: grey;
     outline: 0;
   }
-
+  .admin-support-container{
+    width: min(800px, 90%);
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+    margin: auto;
+  }
   .admin-box-container{
     display: flex;
     flex-wrap: wrap;
@@ -210,11 +215,16 @@ background: linear-gradient(315deg, #F945CE, #651513);
     opacity: 0;
   }
   .message-container{
-    margin: 10px 0;
+    margin: 2rem 0;
     display: flex;
     align-items: flex-start;
     flex-direction: column;
     gap: 1rem;
+  }
+  .request-card{
+    position: relative;
+    border-top: 1px solid rgba(128, 128, 128, 0.627);
+    border-radius: 1.5rem;
   }
   .message-container div{
     padding: 12px;
@@ -225,24 +235,30 @@ background: linear-gradient(315deg, #F945CE, #651513);
     flex-wrap: wrap;
     justify-content: space-between;
   }
-  .message-container div:nth-child(odd){
-    background-color: #1c1939;
+  .chips-group{
+        display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start !important;
+    gap: 10px !important;
   }
   .message-container div button{
-    box-shadow:inset 0px 1px 0px 0px #cf866c;
-	background:linear-gradient(to bottom, #d0451b 5%, #bc3315 100%);
-	background-color:#d0451b;
-	border-radius:42px;
-	border:2px solid #942911;
-	display:inline-block;
-	cursor:pointer;
-	color:#ffffff;
-	font-family:Arial;
-  transition: .2s;
-	font-size:13px;
-	padding:6px 24px;
-	text-decoration:none;
-	text-shadow:0px 1px 0px #854629;
+    bottom: 4px;
+    box-shadow: inset 0px 1px 0px 0px #cf866c;
+    background: linear-gradient(to bottom, #d0451b 5%, #bc3315 100%);
+    background-color: #d0451b;
+    border-radius: 42px;
+    border: 2px solid #942911;
+    display: inline-block;
+    cursor: pointer;
+    color: #ffffff;
+    right: 4px;
+    font-family: Arial;
+    position: absolute;
+    transition: .2s;
+    font-size: 13px;
+    padding: 6px 24px;
+    text-decoration: none;
+    text-shadow: 0px 1px 0px #854629;
   }
   .message-container div button:hover{
     opacity: .7;
@@ -267,4 +283,7 @@ background: linear-gradient(315deg, #F945CE, #651513);
     color: black;
     background-color: #57a4ffdb;
     align-content: space-around;
+  }
+  .request-message{
+
   }
