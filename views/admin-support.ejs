@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&amp;display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+   
     <title>Admin Support Page</title>
 </head>
 <body>
@@ -60,9 +62,9 @@
             </li>
         </ul>
     </nav>
-    <section class="home-container">
+    <section class="admin-support-container">
         <form>
-            <label for="filter">Filter by:</label>
+            <label for="filter" hidden>Filter by:</label>
             <select id="filterSelect" class="classic">
                 <option value="All">All</option>
                 <option value="Contact">Contact</option>
@@ -133,17 +135,18 @@ const istOptions = {
   minute: '2-digit',
   hour12: true, // Use 12-hour format
 };
-
+console.clear();
 const formattedTimestamp = date.toLocaleString('en-IN', istOptions);
                 const requestElement = document.createElement('div');
-                requestElement.innerHTML = `<span class="contact-type">${request.type}</span>Message: ${request.content}, Email: ${request.contactInfo} <span class="contact-time">${formattedTimestamp}</span>`;
+                requestElement.innerHTML = `<div class="chips-group"><span class="contact-type">${request.type}</span><span class="contact-time">${formattedTimestamp}</span><a href="mailto:${request.contactInfo}" target="_blank" data-tooltip="Send reply via mail"><i class="fa fa-reply" aria-hidden="true"></i></a></div><p class="request-message">${request.content}</p> `;
                 const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
+                deleteButton.innerHTML = '<i class="fa-solid fa-trash"></i>';
                 deleteButton.addEventListener('click', () => {
                     deleteSupportRequest(request._id);
                 });
                 requestElement.appendChild(deleteButton);
                 requestElement.id = `support-request-${request._id}`;
+                requestElement.classList.add("request-card");
                 supportRequestsContainer.appendChild(requestElement);
             });
         };
