@@ -193,6 +193,7 @@ const replySchema = new mongoose.Schema({
   reportedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
+
 const Discussion = mongoose.model('Discussion', discussionSchema);
 const Reply = mongoose.model('Reply', replySchema);
 
