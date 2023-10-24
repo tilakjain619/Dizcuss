@@ -10,10 +10,10 @@ const passportLocalMongoose = require('passport-local-mongoose');
 require('dotenv').config();
 
 // atlas connection
-// const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
+const atlasConnectionString = process.env.MONGODB_ATLAS_URI;
 
 // local connection
-const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
+// const mongoURI = 'mongodb://127.0.0.1:27017/dizcuss';
 const app = express();
 const port = 3000;
 app.use(express.json());
@@ -193,10 +193,11 @@ const replySchema = new mongoose.Schema({
   reportedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 });
 
+
 const Discussion = mongoose.model('Discussion', discussionSchema);
 const Reply = mongoose.model('Reply', replySchema);
 
-mongoose.connect(mongoURI, {
+mongoose.connect(atlasConnectionString, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
