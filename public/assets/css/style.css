@@ -267,6 +267,9 @@ header {
     height: 90vh;
     display: grid;
     align-content: center;
+    margin: auto;
+    width: min(700px, 90%);
+    align-items: center;
 }
 
 .join-title {
@@ -275,17 +278,11 @@ header {
 }
 
 #join-text {
-    text-align: left;
+    text-align: center;
     padding: 10px;
 }
-
-.j-text {
-    transform: scale(0);
-}
-
 .join-text {
     padding: 10px;
-    animation: slide-left 0.4s linear both;
     font-size: 15px;
 }
 
@@ -299,17 +296,6 @@ header {
         transform: translateX(0);
     }
 } */
-
-@keyframes slide-left {
-    0% {
-        transform: translateX(-100px)
-    }
-
-    100% {
-        transform: translateX(0)
-    }
-}
-
 /* @keyframes popup {
     0% {
         transform: scale(1);

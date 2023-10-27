@@ -10,7 +10,8 @@
 
     <link rel="stylesheet" href="./assets/css/style.css">
     <link rel="stylesheet" href="https://unpkg.com/swiper@8/swiper-bundle.min.css" />
-
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -19,6 +20,9 @@
 </head>
 
 <body>
+    <script>
+        AOS.init(); // for scroll animation
+    </script>
     <nav class="navbar" id="main-navbar">
         <span class="navbar-toggle" id="js-navbar-toggle">
             <i class="fas fa-bars"></i>
@@ -81,7 +85,7 @@
     </section>
     <h2 class="s-title" style="font-size: 2rem;">What our users say</h2>
         <section class="user-reviews">
-        <figure class="snip1157">
+        <figure class="snip1157" data-aos="zoom-in-up">
             <blockquote>Kudos for making the registration process hassle-free. It's super easy for users to sign up!
               <div class="arrow"></div>
             </blockquote>
@@ -90,7 +94,7 @@
               <h5>Jane Doe</h5>
             </div>
           </figure>
-          <figure class="snip1157 hover">
+          <figure class="snip1157 hover" data-aos="zoom-in-up">
             <blockquote>Great job on getting the forum up and running! The user interface is functional and easy to navigate.
               <div class="arrow"></div>
             </blockquote>
@@ -99,7 +103,7 @@
               <h5>Omkar Yedekar</h5>
             </div>
           </figure>
-          <figure class="snip1157">
+          <figure class="snip1157" data-aos="zoom-in-up">
             <blockquote>The forum's getting there! The quick reply option encourages more dynamic conversations and interactions among users.
               <div class="arrow"></div>
             </blockquote>
@@ -109,7 +113,7 @@
             </div>
           </figure>
     </section>
-    <section id="join" class="j-text join-text">
+    <section id="join" class="j-text join-text" data-aos="fade-up" data-aos-duration="1000">
         <h2 class="join-title s-title">Join Dizcuss Today!</h2>
         <p id="join-text">Signing up for Dizcuss is easy and free.<br> Join our ever-growing
             community and start benefiting from the knowledge and insights of our members. Whether you're a curious
