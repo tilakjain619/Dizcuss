@@ -25,26 +25,6 @@ let swiper = new Swiper(".mySwiper", {
   grabCursor: true,
  });
 
-// pop on scroll animation using intersection observer api
-const section = document.querySelector("#join");
-const joinText = document.querySelector("#join");
-
-const objOptions = {
-  root: null
-};
-
-const sectionObserver = new IntersectionObserver(callBackFunction, objOptions);
-sectionObserver.observe(section);
-
-function callBackFunction(entries) {
-  const [entry] = entries;
-  if (entry.isIntersecting) {
-    joinText.classList.remove("j-text");
-  } else {
-    joinText.classList.add("j-text");
-  }
-}
-
 let words = document.getElementsByClassName('word');
 let wordArray = [];
 let currentWord = 0;
