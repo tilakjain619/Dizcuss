@@ -86,8 +86,9 @@
                                 <% const createdAt=new Date(reply.createdAt); const
                                 formattedTimestampReply=formatTimestamp(createdAt); %>
                                 <li class="reply-component">
-                                    <a href="/member/<%= user.username %>">
-                                        <p class="reply-username">
+                                    <a href="/member/<%= user.username %>" class="user-detail-name">
+                                        <p class="user-full-name"><%= user.fullName %></p>
+                                        <p class="user-name">
                                             @<%= user.username %>
                                         </p>
                                     </a>
